@@ -4,4 +4,4 @@
 4.- create superuser: python manage.py populatedb --createsuperuser
 5.- run server: python manage.py runserver
 
-6.-  test /8000
+6.-  test port: 8000
