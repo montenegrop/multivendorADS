@@ -44,6 +44,8 @@ from ..discount import DiscountInfo
 from ..discount.utils import calculate_discounted_price
 from ..seo.models import SeoModel, SeoModelTranslation
 
+from ..vendors.models import Vendor
+
 if TYPE_CHECKING:
     # flake8: noqa
     from django.db.models import OrderBy
@@ -337,6 +339,10 @@ class Product(SeoModel, ModelWithMetadata):
 
     objects = ProductsQueryset.as_manager()
     translated = TranslationProxy()
+
+    vendor = models.ForeignKey(
+        Vendor, related_name="products", on_delete=models.CASCADE
+    )
 
     class Meta:
         app_label = "product"
