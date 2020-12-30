@@ -160,7 +160,7 @@ class User(PermissionsMixin, ModelWithMetadata, AbstractBaseUser):
     objects = UserManager()
 
     vendor = models.ForeignKey(
-        Vendor, related_name="users", on_delete=models.CASCADE
+        Vendor, related_name="users", null=True, on_delete=models.CASCADE
     )
 
     class Meta:

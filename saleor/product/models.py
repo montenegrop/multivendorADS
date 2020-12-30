@@ -341,7 +341,7 @@ class Product(SeoModel, ModelWithMetadata):
     translated = TranslationProxy()
 
     vendor = models.ForeignKey(
-        Vendor, related_name="products", on_delete=models.CASCADE
+        Vendor, related_name="products", null=True, on_delete=models.CASCADE
     )
 
     class Meta:
