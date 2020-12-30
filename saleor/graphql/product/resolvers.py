@@ -85,6 +85,9 @@ def resolve_products(
         qs = qs.annotate_visible_in_listings(channel_slug).exclude(
             visible_in_listings=False
         )
+    #filter by vendor:
+    vendor = requestor.vendor
+    qs = qs.visible_to_vendor(vendor)
     return ChannelQsContext(qs=qs.distinct(), channel_slug=channel_slug)
 
 
