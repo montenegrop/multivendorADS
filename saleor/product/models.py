@@ -44,6 +44,8 @@ from ..discount import DiscountInfo
 from ..discount.utils import calculate_discounted_price
 from ..seo.models import SeoModel, SeoModelTranslation
 
+from ..vendors.models import Vendor
+
 if TYPE_CHECKING:
     # flake8: noqa
     from django.db.models import OrderBy
@@ -167,6 +169,11 @@ class ProductsQueryset(models.QuerySet):
                 return self.filter(channel_listings__channel__slug=str(channel_slug))
             return self.all()
         return self.published_with_variants(channel_slug)
+
+    def visible_to_vendor(self, vendor):
+        return self.filter(vendor=vendor)
+
+    
 
     @staticmethod
     def user_has_access_to_all(user):
@@ -337,6 +344,10 @@ class Product(SeoModel, ModelWithMetadata):
 
     objects = ProductsQueryset.as_manager()
     translated = TranslationProxy()
+
+    vendor = models.ForeignKey(
+        Vendor, related_name="products", null=True, on_delete=models.CASCADE
+    )
 
     class Meta:
         app_label = "product"

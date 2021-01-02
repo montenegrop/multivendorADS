@@ -76,15 +76,20 @@ def resolve_product_by_slug(info, product_slug, channel_slug, requestor):
 
 
 def resolve_products(
-    info, requestor, stock_availability=None, channel_slug=None, **_kwargs
+    info, requestor, stock_availability=None, channel_slug=None, vendor=False, **_kwargs
 ) -> ChannelQsContext:
     qs = models.Product.objects.visible_to_user(requestor, channel_slug)
     if stock_availability:
         qs = filter_products_by_stock_availability(qs, stock_availability)
+    # if the next 'if' doesn't apply must filter by vendor:
     if not qs.user_has_access_to_all(requestor):
         qs = qs.annotate_visible_in_listings(channel_slug).exclude(
             visible_in_listings=False
         )
+    # filter by vendor:
+    if vendor:
+        vendor = requestor.vendor
+        qs = qs.visible_to_vendor(vendor)
     return ChannelQsContext(qs=qs.distinct(), channel_slug=channel_slug)
 
 

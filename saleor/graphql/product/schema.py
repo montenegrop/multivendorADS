@@ -184,6 +184,7 @@ class ProductQueries(graphene.ObjectType):
             description="Slug of a channel for which the data should be returned."
         ),
         description="List of the shop's products.",
+        vendor=graphene.Boolean(description="Filtering by current vendor if true when user is a vendor, can also receive ID.", default_value=False),
     )
     product_type = graphene.Field(
         ProductType,

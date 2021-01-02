@@ -578,6 +578,9 @@ class ProductCreate(ModelMutation):
                 )
             except ValidationError as exc:
                 raise ValidationError({"attributes": exc})
+            
+        # assigning the vendor to product:
+        cleaned_input['vendor'] = info.context.user.vendor
 
         clean_seo_fields(cleaned_input)
         return cleaned_input

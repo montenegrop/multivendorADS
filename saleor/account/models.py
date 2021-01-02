@@ -24,6 +24,8 @@ from ..core.utils.json_serializer import CustomJsonEncoder
 from . import CustomerEvents
 from .validators import validate_possible_number
 
+from ..vendors.models import Vendor
+
 
 class PossiblePhoneNumberField(PhoneNumberField):
     """Less strict field for phone numbers written to database."""
@@ -156,6 +158,10 @@ class User(PermissionsMixin, ModelWithMetadata, AbstractBaseUser):
     USERNAME_FIELD = "email"
 
     objects = UserManager()
+
+    vendor = models.ForeignKey(
+        Vendor, related_name="users", null=True, on_delete=models.CASCADE
+    )
 
     class Meta:
         ordering = ("email",)

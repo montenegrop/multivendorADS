@@ -313,6 +313,8 @@ class ProductFilter(django_filters.FilterSet):
     search = django_filters.CharFilter(method=filter_search)
     ids = GlobalIDMultipleChoiceFilter(field_name="id")
 
+    # here for future vendor ID filter
+
     class Meta:
         model = Product
         fields = [
