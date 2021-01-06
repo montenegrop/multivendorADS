@@ -58,6 +58,7 @@ from ..utils import (
 
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
+from saleor.csv.utils.import_products import import_products_from_xlsx
 
 
 class CategoryInput(graphene.InputObjectType):
@@ -1207,10 +1208,14 @@ class ProductsImport(BaseMutation):
         media_root = settings.MEDIA_ROOT
         media_url = settings.MEDIA_URL
         imported_products_directory = "/imported_products"
-        fs = FileSystemStorage(location=media_root + imported_products_directory,
+        imported_files_path = media_root + imported_products_directory
+        fs = FileSystemStorage(location=imported_files_path,
                                base_url=media_url + imported_products_directory)
         filename = fs.save(file.name, file)
         uploaded_file_url = fs.url(filename)
+
+        wb = import_products_from_xlsx(imported_files_path + '/' + filename)
+
         return ProductsImport(success=True)
 
 
