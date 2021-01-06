@@ -56,6 +56,9 @@ from ..utils import (
     get_used_variants_attribute_values,
 )
 
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+
 
 class CategoryInput(graphene.InputObjectType):
     description = graphene.String(description="Category description (HTML/text).")
@@ -1199,8 +1202,15 @@ class ProductsImport(BaseMutation):
 
     @classmethod
     def perform_mutation(cls, _root, info, **data):
-        print(data.get("file"))
-        print(data)
+        file_variable = data.get("file")
+        file = info.context.FILES[file_variable]
+        media_root = settings.MEDIA_ROOT
+        media_url = settings.MEDIA_URL
+        imported_products_directory = "/imported_products"
+        fs = FileSystemStorage(location=media_root + imported_products_directory,
+                               base_url=media_url + imported_products_directory)
+        filename = fs.save(file.name, file)
+        uploaded_file_url = fs.url(filename)
         return ProductsImport(success=True)
 
 
