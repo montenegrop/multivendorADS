@@ -578,7 +578,7 @@ class ProductCreate(ModelMutation):
                 )
             except ValidationError as exc:
                 raise ValidationError({"attributes": exc})
-            
+
         # assigning the vendor to product:
         cleaned_input['vendor'] = info.context.user.vendor
 
@@ -1173,6 +1173,35 @@ class ProductImageCreateInput(graphene.InputObjectType):
     product = graphene.ID(
         required=True, description="ID of an product.", name="product"
     )
+
+
+class ProductsImport(BaseMutation):
+
+    class Arguments:
+        file = Upload(
+            required=True, description="Fields required to create a product image."
+        )
+
+    success = graphene.Boolean()
+
+    class Meta:
+        description = (
+            "csv import - expand this"
+        )
+        permissions = (ProductPermissions.MANAGE_PRODUCTS,)
+        error_type_class = ProductError
+        error_type_field = "product_errors"
+
+    # @classmethod
+    # def success_response(cls, instance):
+    #     instance = ChannelContext(node=instance, channel_slug=None)
+    #     return super().success_response(instance)
+
+    @classmethod
+    def perform_mutation(cls, _root, info, **data):
+        print(data.get("file"))
+        print(data)
+        return ProductsImport(success=True)
 
 
 class ProductImageCreate(BaseMutation):
