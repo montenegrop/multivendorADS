@@ -173,8 +173,6 @@ class ProductsQueryset(models.QuerySet):
     def visible_to_vendor(self, vendor):
         return self.filter(vendor=vendor)
 
-    
-
     @staticmethod
     def user_has_access_to_all(user):
         return user.is_active and user.has_perm(ProductPermissions.MANAGE_PRODUCTS)
