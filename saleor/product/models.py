@@ -462,6 +462,7 @@ class ProductChannelListing(PublishableModel):
 
 class ProductVariant(SortableModel, ModelWithMetadata):
     sku = models.CharField(max_length=255, unique=True)
+    sku_simple = models.CharField(max_length=255, null=True)
     name = models.CharField(max_length=255, blank=True)
     product = models.ForeignKey(
         Product, related_name="variants", on_delete=models.CASCADE

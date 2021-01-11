@@ -1214,7 +1214,9 @@ class ProductsImport(BaseMutation):
         filename = fs.save(file.name, file)
         uploaded_file_url = fs.url(filename)
 
-        wb = import_products_from_xlsx(imported_files_path + '/' + filename)
+        vendor_id = info.context.user.vendor.id
+
+        wb = import_products_from_xlsx(imported_files_path + '/' + filename, vendor_id)
 
         return ProductsImport(success=True)
 

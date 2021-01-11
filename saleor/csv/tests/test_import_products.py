@@ -3,5 +3,5 @@ import unittest
 
 class ImportProductsTests(unittest.TestCase):
     def test_algo(self):
-        print("s")
+        print("sw")
         return 3
