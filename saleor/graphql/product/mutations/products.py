@@ -56,6 +56,10 @@ from ..utils import (
     get_used_variants_attribute_values,
 )
 
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+from saleor.csv.utils.import_products import import_products_from_xlsx
+
 
 class CategoryInput(graphene.InputObjectType):
     description = graphene.String(description="Category description (HTML/text).")
@@ -578,7 +582,7 @@ class ProductCreate(ModelMutation):
                 )
             except ValidationError as exc:
                 raise ValidationError({"attributes": exc})
-            
+
         # assigning the vendor to product:
         cleaned_input['vendor'] = info.context.user.vendor
 
@@ -1173,6 +1177,48 @@ class ProductImageCreateInput(graphene.InputObjectType):
     product = graphene.ID(
         required=True, description="ID of an product.", name="product"
     )
+
+
+class ProductsImport(BaseMutation):
+
+    class Arguments:
+        file = Upload(
+            required=True, description="Fields required to create a product image."
+        )
+
+    success = graphene.Boolean()
+
+    class Meta:
+        description = (
+            "csv import - expand this"
+        )
+        permissions = (ProductPermissions.MANAGE_PRODUCTS,)
+        error_type_class = ProductError
+        error_type_field = "product_errors"
+
+    # @classmethod
+    # def success_response(cls, instance):
+    #     instance = ChannelContext(node=instance, channel_slug=None)
+    #     return super().success_response(instance)
+
+    @classmethod
+    def perform_mutation(cls, _root, info, **data):
+        file_variable = data.get("file")
+        file = info.context.FILES[file_variable]
+        media_root = settings.MEDIA_ROOT
+        media_url = settings.MEDIA_URL
+        imported_products_directory = "/imported_products"
+        imported_files_path = media_root + imported_products_directory
+        fs = FileSystemStorage(location=imported_files_path,
+                               base_url=media_url + imported_products_directory)
+        filename = fs.save(file.name, file)
+        uploaded_file_url = fs.url(filename)
+
+        vendor_id = info.context.user.vendor.id
+
+        wb = import_products_from_xlsx(imported_files_path + '/' + filename, vendor_id)
+
+        return ProductsImport(success=True)
 
 
 class ProductImageCreate(BaseMutation):

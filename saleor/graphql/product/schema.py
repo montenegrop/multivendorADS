@@ -68,6 +68,7 @@ from .mutations.products import (
     ProductCreate,
     ProductDelete,
     ProductImageCreate,
+    ProductsImport,
     ProductImageDelete,
     ProductImageReorder,
     ProductImageUpdate,
@@ -184,7 +185,8 @@ class ProductQueries(graphene.ObjectType):
             description="Slug of a channel for which the data should be returned."
         ),
         description="List of the shop's products.",
-        vendor=graphene.Boolean(description="Filtering by current vendor if true when user is a vendor, can also receive ID.", default_value=False),
+        vendor=graphene.Boolean(
+            description="Filtering by current vendor if true when user is a vendor, can also receive ID.", default_value=False),
     )
     product_type = graphene.Field(
         ProductType,
@@ -395,6 +397,7 @@ class ProductMutations(graphene.ObjectType):
     product_channel_listing_update = ProductChannelListingUpdate.Field()
 
     product_image_create = ProductImageCreate.Field()
+    products_import = ProductsImport.Field()
     product_variant_reorder = ProductVariantReorder.Field()
     product_image_delete = ProductImageDelete.Field()
     product_image_bulk_delete = ProductImageBulkDelete.Field()
