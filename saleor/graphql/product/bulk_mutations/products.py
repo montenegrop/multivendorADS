@@ -314,6 +314,12 @@ class ProductVariantBulkCreate(BaseMutation):
                 instance = models.ProductVariant()
                 cleaned_input["product"] = product
                 instance = cls.construct_instance(instance, cleaned_input)
+
+                # define sku_simple as sku:
+                instance.sku_simple = instance.sku
+                # define sku as sku_simple + 00000 + vendor.id:
+                instance.sku = instance.sku_simple + '00000' + str(product.vendor_id)
+
                 cls.clean_instance(info, instance)
                 instances.append(instance)
             except ValidationError as exc:

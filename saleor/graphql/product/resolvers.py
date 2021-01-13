@@ -78,7 +78,7 @@ def resolve_product_by_slug(info, product_slug, channel_slug, requestor):
 def resolve_products(
     info, requestor, stock_availability=None, channel_slug=None, vendor=False, **_kwargs
 ) -> ChannelQsContext:
-    qs = models.Product.objects.visible_to_user(requestor, channel_slug)
+    qs = models.Product.objects.all()
     if stock_availability:
         qs = filter_products_by_stock_availability(qs, stock_availability)
     # if the next 'if' doesn't apply must filter by vendor:
