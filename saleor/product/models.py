@@ -314,6 +314,7 @@ class Product(SeoModel, ModelWithMetadata):
         ProductType, related_name="products", on_delete=models.CASCADE
     )
     name = models.CharField(max_length=250)
+    id_simple = models.IntegerField(blank=True, null=True)
     slug = models.SlugField(max_length=255, unique=True, allow_unicode=True)
     description = models.TextField(blank=True)
     description_json = SanitizedJSONField(
