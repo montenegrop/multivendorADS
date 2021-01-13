@@ -45,6 +45,7 @@ from ..discount.utils import calculate_discounted_price
 from ..seo.models import SeoModel, SeoModelTranslation
 
 from ..vendors.models import Vendor
+from saleor.core.utils.slug_generator import unique_slugify
 
 if TYPE_CHECKING:
     # flake8: noqa
@@ -371,6 +372,11 @@ class Product(SeoModel, ModelWithMetadata):
 
     def __str__(self) -> str:
         return self.name
+
+    def save(self, **kwargs):
+        slug_str = self.name
+        unique_slugify(self, slug_str)
+        super(Product, self).save(**kwargs)
 
     @property
     def plain_text_description(self) -> str:
