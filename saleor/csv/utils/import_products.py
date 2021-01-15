@@ -4,8 +4,11 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 
 from openpyxl import load_workbook
-from saleor.product.models import Product, ProductVariant, ProductType, Vendor
+from saleor.product.models import Product, ProductVariant, ProductType, Vendor, ProductChannelListing
 from django.db import transaction
+from saleor.settings import DEFAULT_CURRENCY
+from saleor.channel.models import Channel
+import datetime
 
 
 # variant attributes:
@@ -16,6 +19,15 @@ PRODUCT_ID = {"header": "id", "attribute": "id_simple"}
 PRODUCT_NAME = {"header": "name", "attribute": "name"}
 PRODUCT_TYPE_NAME = {"header": "product type", "attribute": "product_type"}
 
+# product channel listing:
+CHANNEL_CURRENCY = {"header": "moneda", "attribute": "currency"}
+CHANNEL_VISIBLE_IN_LISTINGSS = {
+    "header": "publicar", "attribute": "visible_in_listings"}
+VISIBLE = True
+CHANNEL_IS_PUBLISHED = {"header": "publicar", "attribute": "visible_in_listings"}
+PUBLISHED = True
+
+
 # validaciones:
 
 
@@ -23,9 +35,13 @@ def row_to_object(headers, data, vendor_id):
 
     sku_simple = None
     id_simple = None
+    currency = DEFAULT_CURRENCY
     for i, header in enumerate(headers):
         sku_simple = data[i] if header == VARIANT_SKU['header'] else sku_simple
         id_simple = data[i] if header == PRODUCT_ID['header'] else id_simple
+        currency = data[i] if header == CHANNEL_CURRENCY['header'] else currency
+
+    channel = Channel.objects.get(currency_code=currency)
 
     if sku_simple == ' ':
         raise Exception('invalid SKU')
@@ -53,6 +69,17 @@ def row_to_object(headers, data, vendor_id):
         vendor = Vendor.objects.get(id=vendor_id)
         product = Product(id_simple=id_simple, vendor=vendor)
 
+    # product_channel_listing:
+    try:
+        product_channel = product.channel_listings.get(currency=currency)
+    except:
+        product_channel = ProductChannelListing(currency=currency)
+    product_channel.product = product
+    product_channel.__setattr__(CHANNEL_VISIBLE_IN_LISTINGSS['attribute'], VISIBLE)
+    product_channel.__setattr__(CHANNEL_IS_PUBLISHED['attribute'], PUBLISHED)
+    product_channel.available_for_purchase = datetime.date.today()
+    product_channel.channel = channel
+
     for n, attr_name in enumerate(headers):
         value = data[n]
         try:
@@ -71,6 +98,7 @@ def row_to_object(headers, data, vendor_id):
         else:
             print("no exceptions")
     product.save()
+    product_channel.save()
     product_variant.product = product
     product_variant.save()
 
