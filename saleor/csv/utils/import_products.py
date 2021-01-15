@@ -5,6 +5,7 @@ from django.db.models.fields.related import ManyToManyField, ForeignKey
 
 from openpyxl import load_workbook
 from saleor.product.models import Product, ProductVariant, ProductType, Vendor
+from django.db import transaction
 
 
 # variant attributes:
@@ -15,6 +16,8 @@ PRODUCT_ID = {"header": "id", "attribute": "id_simple"}
 PRODUCT_NAME = {"header": "name", "attribute": "name"}
 PRODUCT_TYPE_NAME = {"header": "product type", "attribute": "product_type"}
 
+# validaciones:
+
 
 def row_to_object(headers, data, vendor_id):
 
@@ -23,6 +26,9 @@ def row_to_object(headers, data, vendor_id):
     for i, header in enumerate(headers):
         sku_simple = data[i] if header == VARIANT_SKU['header'] else sku_simple
         id_simple = data[i] if header == PRODUCT_ID['header'] else id_simple
+
+    if sku_simple == ' ':
+        raise Exception('invalid SKU')
 
     if not sku_simple or not id_simple:
         print('not SKU OR ID')
@@ -80,8 +86,7 @@ def verify_products_from_xlsx(filename):
     return (True, "no errors")
 
 
-def import_products_from_xlsx(filename, vendor_id):
-    verify_products_from_xlsx(filename=filename)
+def get_row(filename):
     wb = load_workbook(filename=filename)
     ws = wb.active
 
@@ -91,11 +96,22 @@ def import_products_from_xlsx(filename, vendor_id):
         for cell in row:
             headers.append(cell.value) if n == 0 else data.append(cell.value)
 
-        if len(data):
+        if n != 0:
+            yield (n, headers, data)
+
+
+@transaction.atomic
+def insert_products_from_xlsx(filename, vendor_id):
+    for (n, headers, data) in get_row(filename):
+        if len(data) != 0:
             row_to_object(headers, data, vendor_id)
         try:
             pass
         except Exception as e:
             raise e
-            return HttpResponseBadRequest(str(e))
-    return HttpResponse('File imported successfully')
+    return 'File imported successfully'
+
+
+def import_products_from_xlsx(filename, vendor_id):
+    verify_products_from_xlsx(filename)
+    insert_products_from_xlsx(filename, vendor_id)
