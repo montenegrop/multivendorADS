@@ -4,52 +4,72 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 
 from openpyxl import load_workbook
-from saleor.product.models import Product, ProductVariant, ProductType
+from saleor.product.models import Product, ProductVariant, ProductType, Vendor
+from django.db import transaction
 
 
-# variant_readed_attributes:
-VARIANT_SKU = "variant sku"
+# variant attributes:
+VARIANT_SKU = {"header": "variant sku", "attribute": "sku_simple"}
 
+# products attributes:
+PRODUCT_ID = {"header": "id", "attribute": "id_simple"}
+PRODUCT_NAME = {"header": "name", "attribute": "name"}
+PRODUCT_TYPE_NAME = {"header": "product type", "attribute": "product_type"}
 
-product_readed_attributes = {
-    "name": "name",
-    # "category": "category",
-    "product type": "product_type",
-}
+# validaciones:
 
 
 def row_to_object(headers, data, vendor_id):
 
     sku_simple = None
+    id_simple = None
     for i, header in enumerate(headers):
-        sku_simple = data[i] if header == VARIANT_SKU else sku_simple
+        sku_simple = data[i] if header == VARIANT_SKU['header'] else sku_simple
+        id_simple = data[i] if header == PRODUCT_ID['header'] else id_simple
 
+    if sku_simple == ' ':
+        raise Exception('invalid SKU')
+
+    if not sku_simple or not id_simple:
+        print('not SKU OR ID')
+        return
+
+    # Retrieve or define variant:
     if ProductVariant.objects.filter(
             sku_simple=sku_simple, product__vendor_id=vendor_id).exists():
-        product_variant = ProductVariant.objects.filter(
-            sku_simple=sku_simple, product__vendor_id=vendor_id).first()
+        product_variant = ProductVariant.objects.get(
+            sku_simple=sku_simple, product__vendor_id=vendor_id)
     else:
         sku = sku_simple + '00000' + str(vendor_id)
         product_variant = ProductVariant(sku=sku, sku_simple=sku_simple)
 
-    product = product_variant.product if product_variant.product_id else Product()
+    # Retrieve or define product, aslo check if product id is valid:
+    if product_variant.product_id:
+        product = product_variant.product
+        if id_simple and product_variant.product.id_simple != id_simple:
+            raise Exception(
+                'el id del producto no corresponde con el producto del variant')
+    else:
+        vendor = Vendor.objects.get(id=vendor_id)
+        product = Product(id_simple=id_simple, vendor=vendor)
 
     for n, attr_name in enumerate(headers):
         value = data[n]
-        # change read attr_name from ImportedProductAttributes to product real attribute:
         try:
-            attr_name = product_readed_attributes[attr_name]
-            if attr_name == "name":
-                product.__setattr__(attr_name, value)
-            if attr_name == "product_type":
-                print('here')
-                product_type = ProductType.objects.get(name=value)
-                # product_type.slug = "slug_type" + str(n)
+            if attr_name == PRODUCT_TYPE_NAME['header']:
+                product_type = ProductType.objects.get(
+                    name=value)
                 product.product_type = product_type
+                continue
+
+            if attr_name == PRODUCT_NAME['header']:
+                product.__setattr__(PRODUCT_NAME['attribute'], value)
+                continue
+
         except KeyError:
             continue
         else:
-            print("unexpected error")
+            print("no exceptions")
     product.save()
     product_variant.product = product
     product_variant.save()
@@ -66,8 +86,7 @@ def verify_products_from_xlsx(filename):
     return (True, "no errors")
 
 
-def import_products_from_xlsx(filename, vendor_id):
-    verify_products_from_xlsx(filename=filename)
+def get_row(filename):
     wb = load_workbook(filename=filename)
     ws = wb.active
 
@@ -77,11 +96,22 @@ def import_products_from_xlsx(filename, vendor_id):
         for cell in row:
             headers.append(cell.value) if n == 0 else data.append(cell.value)
 
-        if len(data):
+        if n != 0:
+            yield (n, headers, data)
+
+
+@transaction.atomic
+def insert_products_from_xlsx(filename, vendor_id):
+    for (n, headers, data) in get_row(filename):
+        if len(data) != 0:
             row_to_object(headers, data, vendor_id)
         try:
             pass
         except Exception as e:
             raise e
-            return HttpResponseBadRequest(str(e))
-    return HttpResponse('File imported successfully')
+    return 'File imported successfully'
+
+
+def import_products_from_xlsx(filename, vendor_id):
+    verify_products_from_xlsx(filename)
+    insert_products_from_xlsx(filename, vendor_id)

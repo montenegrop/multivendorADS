@@ -45,6 +45,7 @@ from ..discount.utils import calculate_discounted_price
 from ..seo.models import SeoModel, SeoModelTranslation
 
 from ..vendors.models import Vendor
+from saleor.core.utils.slug_generator import unique_slugify
 
 if TYPE_CHECKING:
     # flake8: noqa
@@ -314,6 +315,7 @@ class Product(SeoModel, ModelWithMetadata):
         ProductType, related_name="products", on_delete=models.CASCADE
     )
     name = models.CharField(max_length=250)
+    id_simple = models.IntegerField(blank=True, null=True)
     slug = models.SlugField(max_length=255, unique=True, allow_unicode=True)
     description = models.TextField(blank=True)
     description_json = SanitizedJSONField(
@@ -370,6 +372,11 @@ class Product(SeoModel, ModelWithMetadata):
 
     def __str__(self) -> str:
         return self.name
+
+    def save(self, **kwargs):
+        slug_str = self.name
+        unique_slugify(self, slug_str)
+        super(Product, self).save(**kwargs)
 
     @property
     def plain_text_description(self) -> str:
