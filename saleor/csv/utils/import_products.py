@@ -4,11 +4,12 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 
 from openpyxl import load_workbook
-from saleor.product.models import Product, ProductVariant, ProductType, Vendor, ProductChannelListing
+from saleor.product.models import Product, ProductVariant, ProductType, Vendor, ProductChannelListing, ProductVariantChannelListing
 from django.db import transaction
 from saleor.settings import DEFAULT_CURRENCY
 from saleor.channel.models import Channel
 import datetime
+from django.core.exceptions import ObjectDoesNotExist
 
 
 # variant attributes:
@@ -27,6 +28,9 @@ VISIBLE = True
 CHANNEL_IS_PUBLISHED = {"header": "publicar", "attribute": "visible_in_listings"}
 PUBLISHED = True
 
+# product variant channel listing:
+PRICE_AMOUNT = {"header": "precio", "attribute": "price_amount"}
+COST_PRICE_AMOUNT = {"header": "costo", "attribute": "cost_price_amount"}
 
 # validaciones:
 
@@ -36,10 +40,14 @@ def row_to_object(headers, data, vendor_id):
     sku_simple = None
     id_simple = None
     currency = DEFAULT_CURRENCY
+    price_amount = None
+    cost_price_amount = None
     for i, header in enumerate(headers):
         sku_simple = data[i] if header == VARIANT_SKU['header'] else sku_simple
         id_simple = data[i] if header == PRODUCT_ID['header'] else id_simple
         currency = data[i] if header == CHANNEL_CURRENCY['header'] else currency
+        price_amount = data[i] if header == PRICE_AMOUNT['header'] else price_amount
+        cost_price_amount = data[i] if header == COST_PRICE_AMOUNT['header'] else cost_price_amount
 
     channel = Channel.objects.get(currency_code=currency)
 
@@ -72,13 +80,25 @@ def row_to_object(headers, data, vendor_id):
     # product_channel_listing:
     try:
         product_channel = product.channel_listings.get(currency=currency)
-    except:
+    except ObjectDoesNotExist:
         product_channel = ProductChannelListing(currency=currency)
     product_channel.product = product
     product_channel.__setattr__(CHANNEL_VISIBLE_IN_LISTINGSS['attribute'], VISIBLE)
     product_channel.__setattr__(CHANNEL_IS_PUBLISHED['attribute'], PUBLISHED)
     product_channel.available_for_purchase = datetime.date.today()
     product_channel.channel = channel
+
+    # product_variant_channel_listing:
+    try:
+        product_variant_channel = product_variant.channel_listings.get(
+            currency=currency)
+    except ObjectDoesNotExist:
+        product_variant_channel = ProductVariantChannelListing(currency=currency)
+    product_variant_channel.variant = product_variant
+    product_variant_channel.__setattr__(PRICE_AMOUNT['attribute'], price_amount)
+    product_variant_channel.__setattr__(
+        COST_PRICE_AMOUNT['attribute'], cost_price_amount)
+    product_variant_channel.channel = channel
 
     for n, attr_name in enumerate(headers):
         value = data[n]
