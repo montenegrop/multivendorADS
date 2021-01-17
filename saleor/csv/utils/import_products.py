@@ -11,7 +11,10 @@ from saleor.channel.models import Channel
 import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from decimal import Decimal
+from saleor.csv.utils.validators import ColumnValidator
 
+
+# data tiene que ser un diccionario
 
 # variant attributes:
 VARIANT_SKU = {"header": "SKU", "attribute": "sku_simple"}
@@ -38,7 +41,7 @@ PRICE_AMOUNT = {"header": "precio", "attribute": "price_amount"}
 COST_PRICE_AMOUNT = {"header": "costo", "attribute": "cost_price_amount"}
 
 
-def row_to_object(headers, data, vendor_id):
+def row_to_object(data, vendor_id):
 
     id_simple = None
     product_type_name = None
@@ -54,18 +57,18 @@ def row_to_object(headers, data, vendor_id):
     cost_price_amount = None
     currency = DEFAULT_CURRENCY
     # moneda:
-    for i, header in enumerate(headers):
-        id_simple = data[i] if header == PRODUCT_ID['header'] else id_simple
-        product_type_name = data[i] if header == PRODUCT_TYPE_NAME['header'] else product_type_name
-        product_name = data[i] if header == PRODUCT_NAME['header'] else product_name
-        sku_simple = data[i] if header == VARIANT_SKU['header'] else sku_simple
-        variant_name = data[i] if header == VARIANT_NAME['header'] else variant_name
-        description = data[i] if header == PRODUCT_DESCRIPTION['header'] else description
-        price_amount = Decimal(
-            data[i]) if header == PRICE_AMOUNT['header'] and data[i] else price_amount
-        cost_price_amount = Decimal(
-            data[i]) if header == COST_PRICE_AMOUNT['header'] and data[i] else cost_price_amount
-        currency = data[i] if header == CHANNEL_CURRENCY['header'] else currency
+
+    id_simple = data[PRODUCT_ID['header']]
+    product_type_name = data[PRODUCT_TYPE_NAME['header']]
+    product_name = data[PRODUCT_NAME['header']]
+    sku_simple = data[VARIANT_SKU['header']]
+    variant_name = data[VARIANT_NAME['header']]
+    description = data[PRODUCT_DESCRIPTION['header']]
+
+    price_amount = Decimal(data[PRICE_AMOUNT['header']]
+                           ) if data[PRICE_AMOUNT['header']] else price_amount
+    cost_price_amount = Decimal(data[COST_PRICE_AMOUNT['header']]
+                                ) if data[COST_PRICE_AMOUNT['header']] else cost_price_amount
 
     # Retrieve channel:
     channel = Channel.objects.get(currency_code=currency)
@@ -131,10 +134,15 @@ def row_to_object(headers, data, vendor_id):
 
 
 def verify_products_from_xlsx(filename):
-    try:
-        wb = load_workbook(filename=filename)
-    except:
-        return (False, "fail reason")
+
+    for (n, data) in get_row(filename):
+
+        validators = [ColumnValidator]
+        errores = []
+        for validator in validators:
+            validator(data, n).validate()
+
+    return (False, "fail reason")
 
     return (True, "no errors")
 
@@ -145,19 +153,24 @@ def get_row(filename):
 
     headers = []
     for n, row in enumerate(ws.iter_rows()):
-        data = []
+        data = {}
+        m = 0
         for cell in row:
-            headers.append(cell.value) if n == 0 else data.append(cell.value)
+            if n == 0:
+                headers.append(cell.value)
+            else:
+                data[headers[m]] = cell.value
+                m += 1
 
         if n != 0:
-            yield (n, headers, data)
+            yield (n, data)
 
 
 @transaction.atomic
 def insert_products_from_xlsx(filename, vendor_id):
-    for (n, headers, data) in get_row(filename):
+    for (n, data) in get_row(filename):
         if len(data) != 0:
-            row_to_object(headers, data, vendor_id)
+            row_to_object(data, vendor_id)
         try:
             pass
         except Exception as e:

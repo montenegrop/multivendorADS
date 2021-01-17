@@ -3,9 +3,19 @@ class Validator(object):
         self.data = data
         self.n = n
 
-    def validate():
+    def validate(self):
+        pass
+
+
+class ColumnValidator(Validator):
+
+    def validate(self):
+        # false si al excel le falta alguna columna:
+        # return 'error en ' + self.n
         pass
 
 
 class SKUValidator(Validator):
-    pass
+
+    def validate(self):
+        pass
