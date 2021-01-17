@@ -1187,6 +1187,7 @@ class ProductsImport(BaseMutation):
         )
 
     success = graphene.Boolean()
+    errors = graphene.List(graphene.String)
 
     class Meta:
         description = (
@@ -1216,9 +1217,10 @@ class ProductsImport(BaseMutation):
 
         vendor_id = info.context.user.vendor.id
 
-        wb = import_products_from_xlsx(imported_files_path + '/' + filename, vendor_id)
+        (success, errors) = import_products_from_xlsx(
+            imported_files_path + '/' + filename, vendor_id)
 
-        return ProductsImport(success=True)
+        return ProductsImport(success=success, errors=errors)
 
 
 class ProductImageCreate(BaseMutation):

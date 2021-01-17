@@ -56,7 +56,6 @@ def row_to_object(data, vendor_id):
     price_amount = None
     cost_price_amount = None
     currency = DEFAULT_CURRENCY
-    # moneda:
 
     id_simple = data[PRODUCT_ID['header']]
     product_type_name = data[PRODUCT_TYPE_NAME['header']]
@@ -78,16 +77,8 @@ def row_to_object(data, vendor_id):
         product_variant = ProductVariant.objects.get(
             sku_simple=sku_simple, product__vendor_id=vendor_id)
     except ObjectDoesNotExist:
-        sku = sku_simple + '00000' + str(vendor_id)
+        sku = str(sku_simple) + '00000' + str(vendor_id)
         product_variant = ProductVariant(sku=sku, sku_simple=sku_simple)
-
-    # variant validations:
-    if sku_simple == ' ':
-        raise Exception('invalid SKU')
-
-    if not sku_simple or not id_simple:
-        print('not SKU OR ID')
-        return
 
     # Retrieve or define product, aslo check if product id is valid:
     try:
@@ -98,10 +89,6 @@ def row_to_object(data, vendor_id):
     product_type = ProductType.objects.get(name=product_type_name)
     product.product_type = product_type
     product.name = product_name
-
-    # # product validation:
-    # if id_simple and product_variant.product.id_simple != id_simple:
-    #     raise Exception('el id del producto no corresponde con el producto del variant')
 
     # product_channel_listing:
     try:
@@ -135,16 +122,17 @@ def row_to_object(data, vendor_id):
 
 def verify_products_from_xlsx(filename):
 
+    errors = []
     for (n, data) in get_row(filename):
-
         validators = [ColumnValidator]
-        errores = []
         for validator in validators:
-            validator(data, n).validate()
+            error = validator(data, n).validate()
+            if error:
+                errors.append(error)
 
-    return (False, "fail reason")
-
-    return (True, "no errors")
+    if errors:
+        return (False, errors)
+    return (True, "archivo valido")
 
 
 def get_row(filename):
@@ -179,5 +167,8 @@ def insert_products_from_xlsx(filename, vendor_id):
 
 
 def import_products_from_xlsx(filename, vendor_id):
-    verify_products_from_xlsx(filename)
+    (success, errors) = verify_products_from_xlsx(filename)
+    if not success:
+        return (success, errors)
     insert_products_from_xlsx(filename, vendor_id)
+    return (True, None)
