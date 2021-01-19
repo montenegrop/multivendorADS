@@ -129,6 +129,7 @@ USE_TZ = True
 
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
+# "EMAIL_URL = "smtp://usuario@gmail.com:contraseña@smtp.gmail.com:465/?ssl=True", configurar 'less secure a apps'":
 EMAIL_URL = os.environ.get("EMAIL_URL")
 SENDGRID_USERNAME = os.environ.get("SENDGRID_USERNAME")
 SENDGRID_PASSWORD = os.environ.get("SENDGRID_PASSWORD")
