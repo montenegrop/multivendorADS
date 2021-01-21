@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 
 from openpyxl import load_workbook
-from saleor.product.models import Product, ProductVariant, ProductType, Vendor, ProductChannelListing, ProductVariantChannelListing
+from saleor.product.models import Product, ProductVariant, ProductType, Vendor, ProductChannelListing, ProductVariantChannelListing, ProductImage
 from django.db import transaction
 from saleor.settings import DEFAULT_CURRENCY
 from saleor.channel.models import Channel
@@ -12,6 +12,8 @@ import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from decimal import Decimal
 from saleor.csv.utils.validators import ColumnValidator
+
+from saleor.product.thumbnails import create_product_thumbnails
 
 
 # data tiene que ser un diccionario
@@ -116,6 +118,10 @@ def row_to_object(data, vendor_id):
     product_variant.save()
     product_channel.save()
     product_variant_channel.save()
+
+    images = ProductImage.objects.filter(product=product)
+    for image in images:
+        create_product_thumbnails.delay(image.pk)
 
     return
 
