@@ -23,6 +23,8 @@ from .translations.schema import TranslationQueries
 from .warehouse.schema import StockQueries, WarehouseMutations, WarehouseQueries
 from .webhook.schema import WebhookMutations, WebhookQueries
 
+from .vendor.schema import VendorQueries
+
 
 class Query(
     AccountQueries,
@@ -46,6 +48,7 @@ class Query(
     TranslationQueries,
     WarehouseQueries,
     WebhookQueries,
+    VendorQueries,
 ):
     pass
 
