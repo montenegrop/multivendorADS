@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 
 from openpyxl import load_workbook
-from saleor.product.models import Product, ProductVariant, ProductType, Vendor, ProductChannelListing, ProductVariantChannelListing, ProductImage
+from saleor.product.models import Product, ProductVariant, ProductType, Vendor, ProductChannelListing, ProductVariantChannelListing, ProductImage, Category
 from django.db import transaction
 from saleor.settings import DEFAULT_CURRENCY
 from saleor.channel.models import Channel
@@ -18,14 +18,23 @@ from saleor.product.thumbnails import create_product_thumbnails
 
 # data tiene que ser un diccionario
 
-# variant attributes:
+# attributes:
+# ATTRIBUTE = {"header": "atributo", "attribute": ""}
+
+# variant:
 VARIANT_SKU = {"header": "SKU", "attribute": "sku_simple"}
 VARIANT_NAME = {"header": "variante", "attribute": "name"}
+
+# variant attributes:
+COLOR = {"header": "color", "attribute": "color"}
+MEDIDA = {"header": "medida", "attribute": "medida"}
+MATERIAL = {"header": "material", "attribute": "material"}
 
 # products attributes:
 PRODUCT_ID = {"header": "id", "attribute": "id_simple"}
 PRODUCT_NAME = {"header": "nombre", "attribute": "name"}
-PRODUCT_TYPE_NAME = {"header": "categoria", "attribute": "product_type"}
+PRODUCT_TYPE_NAME = {"header": "tipo", "attribute": "product_type"}
+PRODUCT_CATEGORY = {"header": "categoria", "attribute": "category"}
 PRODUCT_DESCRIPTION = {"header": "descripcion", "attribute": "description"}
 
 # channel:
@@ -65,6 +74,7 @@ def row_to_object(data, vendor_id):
     sku_simple = data[VARIANT_SKU['header']]
     variant_name = data[VARIANT_NAME['header']]
     description = data[PRODUCT_DESCRIPTION['header']]
+    category_name = data[PRODUCT_CATEGORY['header']]
 
     price_amount = Decimal(data[PRICE_AMOUNT['header']]
                            ) if data[PRICE_AMOUNT['header']] else price_amount
@@ -88,9 +98,16 @@ def row_to_object(data, vendor_id):
     except ObjectDoesNotExist:
         vendor = Vendor.objects.get(id=vendor_id)
         product = Product(id_simple=id_simple, vendor=vendor)
+
+    # variant attributes:
+
+    # category:
+    category = Category.objects.get(name=category_name)
+
     product_type = ProductType.objects.get(name=product_type_name)
     product.product_type = product_type
     product.name = product_name
+    product.category = category
 
     # product_channel_listing:
     try:
