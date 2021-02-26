@@ -10,7 +10,7 @@ class VendorType(DjangoObjectType):
 
 
 class VendorQueries(ObjectType):
-    vendors = graphene.List(VendorType)
+    vendors = graphene.List(VendorType, description="list all vendors")
 
     def resolve_vendors(self, info, **kwargs):
         return Vendor.objects.all()
