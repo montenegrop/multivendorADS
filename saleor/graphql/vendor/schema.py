@@ -6,6 +6,7 @@ from saleor.vendors.models import Vendor
 
 class VendorType(DjangoObjectType):
     class Meta:
+        description = "Vendors"
         model = Vendor
 
 
@@ -14,3 +15,9 @@ class VendorQueries(ObjectType):
 
     def resolve_vendors(self, info, **kwargs):
         return Vendor.objects.all()
+
+
+# class CreateVendorMutation(graphene.Mutation):
+#     class Arguments:
+#         # The input arguments for this mutation
+#         text = graphene.String(required=True)
