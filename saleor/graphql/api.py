@@ -23,7 +23,7 @@ from .translations.schema import TranslationQueries
 from .warehouse.schema import StockQueries, WarehouseMutations, WarehouseQueries
 from .webhook.schema import WebhookMutations, WebhookQueries
 
-from .vendor.schema import VendorQueries
+from .vendor.schema import VendorQueries, VendorMutations
 
 
 class Query(
@@ -75,6 +75,7 @@ class Mutation(
     ShopMutations,
     WarehouseMutations,
     WebhookMutations,
+    VendorMutations
 ):
     pass
 

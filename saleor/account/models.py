@@ -163,8 +163,6 @@ class User(PermissionsMixin, ModelWithMetadata, AbstractBaseUser):
         Vendor, related_name="users", null=True, on_delete=models.CASCADE
     )
 
-    is_construirte_admin = models.BooleanField(default=False)
-
     class Meta:
         ordering = ("email",)
         permissions = (

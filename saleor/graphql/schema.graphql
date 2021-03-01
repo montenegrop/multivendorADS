@@ -74,6 +74,7 @@ input AccountInput {
   lastName: String
   defaultBillingAddress: AddressInput
   defaultShippingAddress: AddressInput
+  vendorSlug: String
 }
 
 type AccountRegister {
@@ -2561,6 +2562,7 @@ input MoveProductInput {
 }
 
 type Mutation {
+  vendorCreate(input: VendorInput!): VendorRegister
   webhookCreate(input: WebhookCreateInput!): WebhookCreate
   webhookDelete(id: ID!): WebhookDelete
   webhookUpdate(id: ID!, input: WebhookUpdateInput!): WebhookUpdate
@@ -2617,6 +2619,7 @@ type Mutation {
   productTranslate(id: ID!, input: TranslationInput!, languageCode: LanguageCodeEnum!): ProductTranslate
   productChannelListingUpdate(id: ID!, input: ProductChannelListingUpdateInput!): ProductChannelListingUpdate
   productImageCreate(input: ProductImageCreateInput!): ProductImageCreate
+  productsImport(file: Upload!): ProductsImport
   productVariantReorder(moves: [ReorderInput]!, productId: ID!): ProductVariantReorder
   productImageDelete(id: ID!): ProductImageDelete
   productImageBulkDelete(ids: [ID]!): ProductImageBulkDelete
@@ -4361,6 +4364,12 @@ type ProductVariantUpdate {
   productVariant: ProductVariant
 }
 
+type ProductsImport {
+  errors: [String]
+  success: Boolean
+  productErrors: [ProductError!]!
+}
+
 input PublishableChannelListingInput {
   channelId: ID!
   isPublished: Boolean
@@ -4368,6 +4377,7 @@ input PublishableChannelListingInput {
 }
 
 type Query {
+  vendors: [VendorType]
   webhook(id: ID!): Webhook
   webhookEvents: [WebhookEvent]
   webhookSamplePayload(eventType: WebhookSampleEventTypeEnum!): JSONString
@@ -4388,7 +4398,7 @@ type Query {
   collection(id: ID, slug: String, channel: String): Collection
   collections(filter: CollectionFilterInput, sortBy: CollectionSortingInput, channel: String, before: String, after: String, first: Int, last: Int): CollectionCountableConnection
   product(id: ID, slug: String, channel: String): Product
-  products(filter: ProductFilterInput, sortBy: ProductOrder, stockAvailability: StockAvailability, channel: String, before: String, after: String, first: Int, last: Int): ProductCountableConnection
+  products(filter: ProductFilterInput, sortBy: ProductOrder, stockAvailability: StockAvailability, channel: String, vendor: Boolean = false, before: String, after: String, first: Int, last: Int): ProductCountableConnection
   productType(id: ID!): ProductType
   productTypes(filter: ProductTypeFilterInput, sortBy: ProductTypeSortingInput, before: String, after: String, first: Int, last: Int): ProductTypeCountableConnection
   productVariant(id: ID, sku: String, channel: String): ProductVariant
@@ -5401,6 +5411,26 @@ type VariantPricingInfo {
   price: TaxedMoney
   priceUndiscounted: TaxedMoney
   priceLocalCurrency: TaxedMoney
+}
+
+input VendorInput {
+  description: String
+  name: String
+  slug: String
+}
+
+type VendorRegister {
+  errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
+  vendor: VendorType
+}
+
+type VendorType {
+  id: ID!
+  name: String!
+  slug: String!
+  description: String!
+  users(before: String, after: String, first: Int, last: Int): UserCountableConnection!
+  products(before: String, after: String, first: Int, last: Int): ProductCountableConnection!
 }
 
 type VerifyToken {

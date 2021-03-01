@@ -23,6 +23,8 @@ from .base import (
     BaseCustomerCreate,
 )
 
+from saleor.vendors.models import Vendor
+
 
 class AccountRegisterInput(graphene.InputObjectType):
     email = graphene.String(description="The email address of the user.", required=True)
@@ -113,6 +115,7 @@ class AccountInput(graphene.InputObjectType):
     default_shipping_address = AddressInput(
         description="Shipping address of the customer."
     )
+    vendor_slug = graphene.String(description="Vendor slug of the user")
 
 
 class AccountUpdate(BaseCustomerCreate):
@@ -137,6 +140,7 @@ class AccountUpdate(BaseCustomerCreate):
     def perform_mutation(cls, root, info, **data):
         user = info.context.user
         data["id"] = graphene.Node.to_global_id("User", user.id)
+        vendor_slug = data.input.vendor_slug
         return super().perform_mutation(root, info, **data)
 
 
