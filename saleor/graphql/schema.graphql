@@ -5417,6 +5417,7 @@ input VendorInput {
   description: String
   name: String
   slug: String
+  id: ID
 }
 
 type VendorRegister {

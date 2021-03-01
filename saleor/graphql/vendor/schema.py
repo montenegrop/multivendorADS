@@ -33,6 +33,7 @@ class VendorInput(graphene.InputObjectType):
     description = graphene.String(description="Vendor description (HTML/text).")
     name = graphene.String(description="Vendor name.")
     slug = graphene.String(description="Vendor slug.")
+    id = graphene.ID(description="ID of the vendor.")
 
 
 class VendorRegister(ModelMutation):
