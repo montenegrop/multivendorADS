@@ -33,7 +33,6 @@ class VendorInput(graphene.InputObjectType):
     description = graphene.String(description="Vendor description (HTML/text).")
     name = graphene.String(description="Vendor name.")
     slug = graphene.String(description="Vendor slug.")
-    pk = graphene.ID(description="ID of the vendor.")
 
 
 class VendorRegister(ModelMutation):
@@ -62,17 +61,6 @@ class VendorRegister(ModelMutation):
     @transaction.atomic
     def save(cls, info, instance, cleaned_input):
         instance.save()
-
-    # @classmethod
-    # def get_form_kwargs(cls, root, info, **input):
-    #     kwargs = {"data": input}
-
-    #     global_id = input.pop("id", None)
-    #     if global_id:
-    #         node_type, pk = from_global_id(global_id)
-    #         instance = cls._meta.model._default_manager.get(pk=pk)
-    #         kwargs["instance"] = instance
-    #     return kwargs
 
 
 class VendorMutations(graphene.ObjectType):

@@ -140,7 +140,10 @@ class AccountUpdate(BaseCustomerCreate):
     def perform_mutation(cls, root, info, **data):
         user = info.context.user
         data["id"] = graphene.Node.to_global_id("User", user.id)
-        vendor_slug = data.input.vendor_slug
+        vendor_slug = data['input']['vendor_slug']
+        vendor = Vendor.objects.get(slug=vendor_slug)
+        user.vendor = vendor
+        user.save()
         return super().perform_mutation(root, info, **data)
 
 
