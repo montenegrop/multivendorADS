@@ -30,6 +30,7 @@ from .bulk_mutations.products import (
     ProductVariantStocksCreate,
     ProductVariantStocksDelete,
     ProductVariantStocksUpdate,
+    CategoryBulkRelevanceSort,
 )
 from .enums import StockAvailability
 from .filters import (
@@ -375,6 +376,7 @@ class ProductMutations(graphene.ObjectType):
     category_create = CategoryCreate.Field()
     category_delete = CategoryDelete.Field()
     category_bulk_delete = CategoryBulkDelete.Field()
+    category_bulk_relevance_sort = CategoryBulkRelevanceSort.Field()
     category_update = CategoryUpdate.Field()
     category_translate = CategoryTranslate.Field()
 

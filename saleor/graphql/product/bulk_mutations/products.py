@@ -38,6 +38,40 @@ from ..types import Product, ProductVariant
 from ..utils import create_stocks, get_used_variants_attribute_values
 
 
+class CategoryBulkRelevanceSort(BaseMutation):
+    class Arguments:
+        ids = graphene.List(graphene.ID, required=True,
+                            description="list of category IDs ordered by relevance")
+
+    class Meta:
+        description = "change relevance of categories"
+        permissions = ("is_superuser",)
+
+    success = graphene.Boolean()
+    errors = graphene.List(graphene.String)
+
+    @classmethod
+    def perform_mutation(cls, _root, info, **data):
+        ids = data['ids']
+        pks = resolve_global_ids_to_primary_keys(ids)[1]
+        relevance = 1
+        errors = []
+
+        try:
+            for pk in pks:
+                category = models.Category.objects.get(pk=int(pk))
+                category.relevance = relevance
+                relevance += 1
+        except Exception as e:
+            errors.append(e)
+
+        success = True
+        if errors:
+            success = False
+
+        return CategoryBulkRelevanceSort(success=success, errors=errors)
+
+
 class CategoryBulkDelete(ModelBulkDeleteMutation):
     class Arguments:
         ids = graphene.List(
