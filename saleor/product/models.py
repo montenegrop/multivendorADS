@@ -74,6 +74,8 @@ class Category(MPTTModel, ModelWithMetadata, SeoModel):
     tree = TreeManager()
     translated = TranslationProxy()
 
+    relevance = models.IntegerField(default=0)
+
     def __str__(self) -> str:
         return self.name
 
