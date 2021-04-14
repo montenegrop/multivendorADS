@@ -2,6 +2,8 @@ import graphene
 from graphene_federation import key
 from graphene import relay
 from saleor.vendors import models
+from saleor.product.models import Category as CategoryModel
+from saleor.graphql.core.types import Image
 
 from saleor.graphql.utils import get_user_or_app_from_context
 
@@ -38,11 +40,43 @@ class VendorType(DjangoObjectType):
 @key(fields="id")
 class Vendor(ChannelContextTypeWithMetadata, CountableDjangoObjectType):
 
+    main_image = graphene.Field(
+        Image, size=graphene.Int(description="Size of the image.")
+    )
+
     class Meta:
         default_resolver = ChannelContextType.resolver_with_context
         description = "Represents a vendor in the storefront."
         interfaces = [relay.Node, ObjectWithMetadata]
         model = VendorModel
+        only_fields = [
+            "description",
+            "id",
+            "name",
+            "slug",
+            "relevance",
+        ]
+
+    @staticmethod
+    def resolve_main_image(root: VendorModel, info, size=None, **_kwargs):
+        root = root.node
+        if root.main_image:
+            return Image.get_adjusted(
+                image=root.main_image,
+                alt="vendor-alt-FALTA",
+                size=size,
+                rendition_key_set="main_images",
+                info=info,
+            )
+        else:
+            image = CategoryModel.objects.first().background_image
+            return Image.get_adjusted(
+                image=image,
+                alt="vendor-alt-FALTA",
+                size=size,
+                rendition_key_set="main_images",
+                info=info,
+            )
 
 
 def resolve_vendors(
