@@ -4,6 +4,7 @@ from graphene import relay
 from saleor.vendors import models
 from saleor.product.models import Category as CategoryModel
 from saleor.graphql.core.types import Image
+from saleor.graphql.core.types import ChannelSortInputObjectType
 
 from saleor.graphql.utils import get_user_or_app_from_context
 
@@ -86,9 +87,33 @@ def resolve_vendors(
     return ChannelQsContext(qs=qs.distinct(), channel_slug=channel_slug)
 
 
+class VendorSortField(graphene.Enum):
+    NAME = ["name", "slug"]
+    RELEVANCE = ["name", "relevance"]
+
+    @property
+    def description(self):
+        # pylint: disable=no-member
+        if self in [
+            VendorSortField.NAME,
+            VendorSortField.RELEVANCE,
+        ]:
+            sort_name = self.name.lower().replace("_", " ")
+            return f"Sort categories by {sort_name}."
+        raise ValueError("Unsupported enum value: %s" % self.value)
+
+
+class VendorSortingInput(ChannelSortInputObjectType):
+    class Meta:
+        sort_enum = VendorSortField
+        type_name = "vendors"
+
+
 class VendorQueries(graphene.ObjectType):
     vendors = ChannelContextFilterConnectionField(
-        Vendor, description="list all vendors")
+        Vendor,
+        description="list all vendors",
+        sort_by=VendorSortingInput(description="Sort categories."))
     # top_vendors = graphene.List(VendorType, description="list top ")
     # vendor = graphene.Field(
     #     Vendor,
