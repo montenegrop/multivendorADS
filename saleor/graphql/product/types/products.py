@@ -1039,6 +1039,7 @@ class Category(CountableDjangoObjectType):
             "seo_description",
             "seo_title",
             "slug",
+            "relevance",
         ]
         interfaces = [relay.Node, ObjectWithMetadata]
         model = models.Category
