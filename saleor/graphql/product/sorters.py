@@ -29,7 +29,7 @@ class CategorySortField(graphene.Enum):
     NAME = ["name", "slug"]
     PRODUCT_COUNT = ["product_count", "name", "slug"]
     SUBCATEGORY_COUNT = ["subcategory_count", "name", "slug"]
-    RELEVANCE = ["name", "relevance"]
+    RELEVANCE = ["relevance"]
 
     @property
     def description(self):

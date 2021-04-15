@@ -61,6 +61,7 @@ class CategoryBulkRelevanceSort(BaseMutation):
             for pk in pks:
                 category = models.Category.objects.get(pk=int(pk))
                 category.relevance = relevance
+                category.save()
                 relevance += 1
         except Exception as e:
             errors.append(e)
