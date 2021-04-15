@@ -29,6 +29,7 @@ class CategorySortField(graphene.Enum):
     NAME = ["name", "slug"]
     PRODUCT_COUNT = ["product_count", "name", "slug"]
     SUBCATEGORY_COUNT = ["subcategory_count", "name", "slug"]
+    RELEVANCE = ["name", "relevance"]
 
     @property
     def description(self):
@@ -37,6 +38,7 @@ class CategorySortField(graphene.Enum):
             CategorySortField.NAME,
             CategorySortField.PRODUCT_COUNT,
             CategorySortField.SUBCATEGORY_COUNT,
+            CategorySortField.RELEVANCE,
         ]:
             sort_name = self.name.lower().replace("_", " ")
             return f"Sort categories by {sort_name}."

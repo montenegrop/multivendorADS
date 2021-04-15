@@ -1060,7 +1060,7 @@ class Category(CountableDjangoObjectType):
 
     @staticmethod
     def resolve_children(root: models.Category, info, **_kwargs):
-        return root.children.all()
+        return root.children.all().order_by("relevance")
 
     @staticmethod
     def resolve_url(root: models.Category, _info):
