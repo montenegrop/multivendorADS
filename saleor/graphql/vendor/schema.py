@@ -89,7 +89,7 @@ def resolve_vendors(
 
 class VendorSortField(graphene.Enum):
     NAME = ["name", "slug"]
-    RELEVANCE = ["name", "relevance"]
+    RELEVANCE = ["relevance", "name", "slug"]
 
     @property
     def description(self):
