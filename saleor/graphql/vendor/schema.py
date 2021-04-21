@@ -29,24 +29,24 @@ from saleor.graphql.core.fields import (
     PrefetchingConnectionField,
 )
 
+
 from saleor.graphql.core.connection import CountableDjangoObjectType
 
 
 class VendorType(DjangoObjectType):
     class Meta:
-        description = "Vendorszz"
+        description = "Vendors"
         model = VendorModel
 
 
 @key(fields="id")
-class Vendor(ChannelContextTypeWithMetadata, CountableDjangoObjectType):
+class Vendor(CountableDjangoObjectType):
 
     main_image = graphene.Field(
         Image, size=graphene.Int(description="Size of the image.")
     )
 
     class Meta:
-        default_resolver = ChannelContextType.resolver_with_context
         description = "Represents a vendor in the storefront."
         interfaces = [relay.Node, ObjectWithMetadata]
         model = VendorModel
@@ -60,7 +60,6 @@ class Vendor(ChannelContextTypeWithMetadata, CountableDjangoObjectType):
 
     @staticmethod
     def resolve_main_image(root: VendorModel, info, size=None, **_kwargs):
-        root = root.node
         if root.main_image:
             return Image.get_adjusted(
                 image=root.main_image,
@@ -78,13 +77,6 @@ class Vendor(ChannelContextTypeWithMetadata, CountableDjangoObjectType):
                 rendition_key_set="main_images",
                 info=info,
             )
-
-
-def resolve_vendors(
-    info, requestor, channel_slug=None, **_kwargs
-) -> ChannelQsContext:
-    qs = models.Vendor.objects.all()
-    return ChannelQsContext(qs=qs.distinct(), channel_slug=channel_slug)
 
 
 class VendorSortField(graphene.Enum):
@@ -110,10 +102,16 @@ class VendorSortingInput(ChannelSortInputObjectType):
 
 
 class VendorQueries(graphene.ObjectType):
-    vendors = ChannelContextFilterConnectionField(
+    vendors = FilterInputConnectionField(
         Vendor,
         description="list all vendors",
         sort_by=VendorSortingInput(description="Sort categories."))
+
+    vendor = graphene.Field(
+        Vendor,
+        id=graphene.Argument(graphene.ID, description="ID of the vendor."),
+        description="Look up a vendor by ID.",
+    )
     # top_vendors = graphene.List(VendorType, description="list top ")
     # vendor = graphene.Field(
     #     Vendor,
@@ -122,10 +120,21 @@ class VendorQueries(graphene.ObjectType):
     #     description="Look up a vendor by ID.",
     # )
 
-    def resolve_vendors(self, info, channel=None, **kwargs):
+    def resolve_vendor(self, info, id=None, **kwargs):
+        return graphene.Node.get_node_from_global_id(info, id, Vendor)
+
+    # top_vendors = graphene.List(VendorType, description="list top ")
+    # vendor = graphene.Field(
+    #     Vendor,
+    #     id=graphene.Argument(
+    #         graphene.ID, description="ID of the vendor.", required=True),
+    #     description="Look up a vendor by ID.",
+    # )
+
+    def resolve_vendors(self, info, **kwargs):
         requestor = get_user_or_app_from_context(info.context)
         qs = VendorModel.objects.all()
-        return resolve_vendors(info, requestor, channel_slug=channel, **kwargs)
+        return qs
 
 
 class VendorInput(graphene.InputObjectType):
