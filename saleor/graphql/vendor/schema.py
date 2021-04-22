@@ -112,29 +112,12 @@ class VendorQueries(graphene.ObjectType):
         id=graphene.Argument(graphene.ID, description="ID of the vendor."),
         description="Look up a vendor by ID.",
     )
-    # top_vendors = graphene.List(VendorType, description="list top ")
-    # vendor = graphene.Field(
-    #     Vendor,
-    #     id=graphene.Argument(
-    #         graphene.ID, description="ID of the vendor.", required=True),
-    #     description="Look up a vendor by ID.",
-    # )
 
     def resolve_vendor(self, info, id=None, **kwargs):
         return graphene.Node.get_node_from_global_id(info, id, Vendor)
 
-    # top_vendors = graphene.List(VendorType, description="list top ")
-    # vendor = graphene.Field(
-    #     Vendor,
-    #     id=graphene.Argument(
-    #         graphene.ID, description="ID of the vendor.", required=True),
-    #     description="Look up a vendor by ID.",
-    # )
-
     def resolve_vendors(self, info, **kwargs):
-        requestor = get_user_or_app_from_context(info.context)
-        qs = VendorModel.objects.all()
-        return qs
+        return VendorModel.objects.all()
 
 
 class VendorInput(graphene.InputObjectType):
