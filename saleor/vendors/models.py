@@ -26,7 +26,7 @@ class VendorImage(SortableModel):
 
     class Meta:
         ordering = ("sort_order", "pk")
-        app_label = "vendor"
+        app_label = "vendors"
 
     def get_ordering_queryset(self):
         return self.vendor.images.all()
