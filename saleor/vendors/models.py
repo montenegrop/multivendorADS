@@ -1,6 +1,7 @@
+from versatileimagefield.fields import VersatileImageField, PPOIField
+
 from django.db import models
 from saleor.core.models import ModelWithMetadata, SortableModel
-from versatileimagefield.fields import VersatileImageField, PPOIField
 
 # Create your models here.
 

@@ -8,6 +8,8 @@ from saleor.graphql.core.types import ChannelSortInputObjectType
 
 from saleor.graphql.utils import get_user_or_app_from_context
 
+from saleor.graphql.vendor.dataloaders.vendors import ImagesByVendorIdLoader
+
 
 from saleor.graphql.meta.types import ObjectWithMetadata
 
@@ -29,6 +31,8 @@ from saleor.graphql.core.fields import (
     PrefetchingConnectionField,
 )
 
+from saleor.graphql.vendor.types.vendors import VendorImage
+
 
 from saleor.graphql.core.connection import CountableDjangoObjectType
 
@@ -43,7 +47,11 @@ class VendorType(DjangoObjectType):
 class Vendor(CountableDjangoObjectType):
 
     main_image = graphene.Field(
-        Image, size=graphene.Int(description="Size of the image.")
+        Image, size=graphene.Int(description="Size of the image."), description="Banner of the vendor"
+    )
+
+    images = graphene.List(
+        lambda: VendorImage, description="List of images for the vendor."
     )
 
     class Meta:
@@ -77,6 +85,10 @@ class Vendor(CountableDjangoObjectType):
                 rendition_key_set="main_images",
                 info=info,
             )
+
+    @staticmethod
+    def resolve_images(root: VendorModel, info, **_kwargs):
+        return ImagesByVendorIdLoader(info.context).load(root.id)
 
 
 class VendorSortField(graphene.Enum):
