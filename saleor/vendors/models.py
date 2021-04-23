@@ -41,6 +41,7 @@ class VendorContact(models.Model):
     INDEFINITE = 'indefinite'
 
     ROLES = [
+        ('', 'nonce')
         (SALES, 'sales'),
         (PURCHASING, 'purchasing'),
         (INDEFINITE, 'any'),
