@@ -17,10 +17,10 @@ class Vendor(ModelWithMetadata):
     # field for "empresa":
     description = models.TextField(blank=True)
     bussiness = models.TextField(blank=True)
-    founding_year = models.ImageField(null=True)
-    total_employess = models.ImageField(null=True)
-    quality_norms = models.CharField(max_length=70)
-    open_hours = models.CharField(max_length=70)
+    founding_year = models.IntegerField(null=True)
+    total_employess = models.IntegerField(null=True)
+    quality_norms = models.CharField(max_length=70, blank=True)
+    open_hours = models.CharField(max_length=70, blank=True)
     billing = models.CharField(max_length=70, blank=True)
 
 
