@@ -1,14 +1,20 @@
 
 import graphene
 from graphene_federation import key
-
 from graphene import relay
-
+from graphene_django.types import DjangoObjectType
 from saleor.vendors import models
 
 # from saleor.product.templatetags.product_images import get_thumbnail
 
 from saleor.graphql.core.connection import CountableDjangoObjectType
+
+
+@key(fields="id")
+class VendorContact(DjangoObjectType):
+
+    class Meta:
+        model = models.VendorContact
 
 
 @key(fields="id")

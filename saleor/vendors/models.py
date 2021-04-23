@@ -36,16 +36,16 @@ class VendorContact(models.Model):
     phone = models.CharField(max_length=40, blank=True)
     email = models.CharField(max_length=60, blank=True)
 
-    SALES = 'available'
-    PURCHASING = 'borrowed'
-    INDEFINITE = 'any'
+    SALES = 'sales'
+    PURCHASING = 'purchasing'
+    INDEFINITE = 'indefinite'
 
     ROLES = [
         (SALES, 'sales'),
         (PURCHASING, 'purchasing'),
-        (INDEFINITE, 'indefinite'),
+        (INDEFINITE, 'any'),
     ]
-    roles = models.CharField(
+    role = models.CharField(
         max_length=30,
         choices=ROLES,
         blank=True

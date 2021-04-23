@@ -31,7 +31,7 @@ from saleor.graphql.core.fields import (
     PrefetchingConnectionField,
 )
 
-from saleor.graphql.vendor.types.vendors import VendorImage
+from saleor.graphql.vendor.types.vendors import VendorImage, VendorContact
 
 
 from saleor.graphql.core.connection import CountableDjangoObjectType
@@ -54,6 +54,10 @@ class Vendor(CountableDjangoObjectType):
         lambda: VendorImage, description="List of images for the vendor."
     )
 
+    contacts = graphene.List(
+        lambda: VendorContact, description="List of contacts for the vendor."
+    )
+
     class Meta:
         description = "Represents a vendor in the storefront."
         interfaces = [relay.Node, ObjectWithMetadata]
@@ -70,6 +74,9 @@ class Vendor(CountableDjangoObjectType):
             "quality_norms",
             "open_hours",
             "billing",
+            "website_url",
+            "phone",
+            "address",
         ]
 
     @staticmethod
@@ -95,6 +102,10 @@ class Vendor(CountableDjangoObjectType):
     @staticmethod
     def resolve_images(root: VendorModel, info, **_kwargs):
         return ImagesByVendorIdLoader(info.context).load(root.id)
+
+    @staticmethod
+    def resolve_contacts(root: models.VendorContact, info, **_kwargs):
+        return root.contacts.all()
 
 
 class VendorSortField(graphene.Enum):
