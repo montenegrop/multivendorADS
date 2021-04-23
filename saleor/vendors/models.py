@@ -14,7 +14,7 @@ class Vendor(ModelWithMetadata):
         upload_to="vendor-main", blank=True, null=True
     )
 
-    # field for "empresa":
+    # fields for "empresa":
     description = models.TextField(blank=True)
     bussiness = models.TextField(blank=True)
     founding_year = models.IntegerField(null=True)
@@ -22,6 +22,34 @@ class Vendor(ModelWithMetadata):
     quality_norms = models.CharField(max_length=70, blank=True)
     open_hours = models.CharField(max_length=70, blank=True)
     billing = models.CharField(max_length=70, blank=True)
+
+    # fields for "contacto":
+    website_url = models.CharField(max_length=90, blank=True)
+    phone = models.CharField(max_length=40, blank=True)
+    address = models.CharField(max_length=40, blank=True)
+
+
+class VendorContact(models.Model):
+    Vendor = models.ForeignKey(
+        Vendor, related_name="contacts", on_delete=models.CASCADE)
+    name = models.CharField(max_length=50, blank=True)
+    phone = models.CharField(max_length=40, blank=True)
+    email = models.CharField(max_length=60, blank=True)
+
+    SALES = 'available'
+    PURCHASING = 'borrowed'
+    INDEFINITE = 'any'
+
+    ROLES = [
+        (SALES, 'sales'),
+        (PURCHASING, 'purchasing'),
+        (INDEFINITE, 'indefinite'),
+    ]
+    roles = models.CharField(
+        max_length=30,
+        choices=ROLES,
+        blank=True
+    )
 
 
 class VendorImage(SortableModel):
