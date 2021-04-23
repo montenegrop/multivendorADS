@@ -59,11 +59,17 @@ class Vendor(CountableDjangoObjectType):
         interfaces = [relay.Node, ObjectWithMetadata]
         model = VendorModel
         only_fields = [
-            "description",
             "id",
             "name",
             "slug",
             "relevance",
+            "description",
+            "bussiness",
+            "founding_year",
+            "total_employess",
+            "quality_norms",
+            "open_hours",
+            "billing",
         ]
 
     @staticmethod
