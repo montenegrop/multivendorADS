@@ -21,7 +21,7 @@ class Vendor(ModelWithMetadata):
     total_employess = models.ImageField(null=True)
     quality_norms = models.CharField(max_length=70)
     open_hours = models.CharField(max_length=70)
-    billing = models.CharField(max_length=70)
+    billing = models.CharField(max_length=70, blank=True)
 
 
 class VendorImage(SortableModel):
