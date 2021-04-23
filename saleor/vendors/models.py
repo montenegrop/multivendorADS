@@ -9,11 +9,19 @@ from saleor.core.models import ModelWithMetadata, SortableModel
 class Vendor(ModelWithMetadata):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=55, unique=True, allow_unicode=True)
-    description = models.TextField(blank=True)
     relevance = models.IntegerField(default=0)
     main_image = VersatileImageField(
         upload_to="vendor-main", blank=True, null=True
     )
+
+    # field for "empresa":
+    description = models.TextField(blank=True)
+    bussiness = models.TextField(blank=True)
+    founding_year = models.ImageField(null=True)
+    total_employess = models.ImageField(null=True)
+    quality_norms = models.CharField(max_length=70)
+    open_hours = models.CharField(max_length=70)
+    billing = models.CharField(max_length=70)
 
 
 class VendorImage(SortableModel):
