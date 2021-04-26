@@ -13,6 +13,7 @@ from ...attribute.models import (
     Attribute,
 )
 from ...product.models import Category, Collection, Product, ProductType, ProductVariant
+from saleor.vendors.models import Vendor
 from ...search.backends import picker
 from ...warehouse.models import Stock
 from ..channel.filters import get_channel_slug_from_filter_data
@@ -126,6 +127,11 @@ def filter_products_by_categories(qs, categories):
     return qs.filter(category__in=ids)
 
 
+def filter_products_by_vendors(qs, vendors):
+    ids = {vendor.id for vendor in vendors}
+    return qs.filter(vendor__in=ids)
+
+
 def filter_products_by_collections(qs, collections):
     return qs.filter(collections__in=collections)
 
@@ -164,6 +170,13 @@ def filter_categories(qs, _, value):
     if value:
         categories = get_nodes(value, "Category", Category)
         qs = filter_products_by_categories(qs, categories)
+    return qs
+
+
+def filter_vendors(qs, _, value):
+    if value:
+        vendors = get_nodes(value, "Vendor", Vendor)
+        qs = filter_products_by_vendors(qs, vendors)
     return qs
 
 
@@ -314,6 +327,8 @@ class ProductFilter(django_filters.FilterSet):
     ids = GlobalIDMultipleChoiceFilter(field_name="id")
 
     # here for future vendor ID filter
+
+    vendors = GlobalIDMultipleChoiceFilter(method=filter_vendors)
 
     class Meta:
         model = Product
