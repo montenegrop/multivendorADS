@@ -118,7 +118,9 @@ class Vendor(CountableDjangoObjectType):
     def resolve_main_categories(root: VendorModel, info, **_kwargs):
         categories = CategoryModel.objects.filter(
             products__vendor_id=root.id)
-        return CategoryModel.objects.filter(children__in=categories).order_by('relevance')
+        return CategoryModel.objects.filter(
+            children__in=categories).distinct().order_by(
+            'relevance')
 
 
 class VendorSortField(graphene.Enum):
