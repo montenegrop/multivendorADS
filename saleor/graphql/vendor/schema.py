@@ -24,6 +24,8 @@ from saleor.vendors.models import Vendor as VendorModel
 from saleor.graphql.core.mutations import BaseMutation, ModelDeleteMutation, ModelMutation
 
 from saleor.graphql.channel import ChannelContext, ChannelQsContext
+from saleor.graphql.product.types import Category
+
 
 from saleor.graphql.core.fields import (
     ChannelContextFilterConnectionField,
@@ -47,11 +49,16 @@ class VendorType(DjangoObjectType):
 class Vendor(CountableDjangoObjectType):
 
     main_image = graphene.Field(
-        Image, size=graphene.Int(description="Size of the image."), description="Banner of the vendor"
+        Image, size=graphene.Int(description="Size of the image."),
+        description="Banner of the vendor"
     )
 
     images = graphene.List(
         lambda: VendorImage, description="List of images for the vendor."
+    )
+
+    main_categories = graphene.List(
+        lambda: Category, description="List of level 0 categories used by the vendor."
     )
 
     contacts = graphene.List(
@@ -106,6 +113,12 @@ class Vendor(CountableDjangoObjectType):
     @staticmethod
     def resolve_contacts(root: models.VendorContact, info, **_kwargs):
         return root.contacts.all()
+
+    @staticmethod
+    def resolve_main_categories(root: VendorModel, info, **_kwargs):
+        categories = CategoryModel.objects.filter(
+            products__vendor_id=root.id)
+        return CategoryModel.objects.filter(children__in=categories).order_by('relevance')
 
 
 class VendorSortField(graphene.Enum):
