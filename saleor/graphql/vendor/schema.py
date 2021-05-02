@@ -167,11 +167,14 @@ class VendorQueries(graphene.ObjectType):
 class VendorInput(graphene.InputObjectType):
     description = graphene.String(description="Vendor description (HTML/text).")
     name = graphene.String(description="Vendor name.")
-    slug = graphene.String(description="Vendor slug.")
+    slug = graphene.String(description="Vendor slug. Is unicode")
 
 
 class VendorRegister(ModelMutation):
     class Arguments:
+        id = graphene.Argument(
+            graphene.ID, description="ID of a Vendor to modify.", required=False
+        )
         input = VendorInput(
             description="Fields required to create a vendor.", required=True
         )
