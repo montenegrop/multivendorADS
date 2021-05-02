@@ -17,8 +17,8 @@ class Vendor(ModelWithMetadata):
     # fields for "empresa":
     description = models.TextField(blank=True)
     bussiness = models.TextField(blank=True)
-    founding_year = models.IntegerField(null=True)
-    total_employess = models.IntegerField(null=True)
+    founding_year = models.IntegerField(null=True, blank=True)
+    total_employess = models.IntegerField(null=True, blank=True)
     quality_norms = models.CharField(max_length=70, blank=True)
     open_hours = models.CharField(max_length=70, blank=True)
     billing = models.CharField(max_length=70, blank=True)
