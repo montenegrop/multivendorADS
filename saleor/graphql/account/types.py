@@ -240,6 +240,7 @@ class User(CountableDjangoObjectType):
         "saleor.graphql.payment.types.PaymentSource",
         description="List of stored payment sources.",
     )
+    vendor_id = graphene.String(description="ID of the vendor")
 
     class Meta:
         description = "Represents user data."
@@ -257,6 +258,8 @@ class User(CountableDjangoObjectType):
             "last_login",
             "last_name",
             "note",
+            "type_of_identification",
+            "identification",
         ]
 
     @staticmethod
@@ -363,6 +366,10 @@ class User(CountableDjangoObjectType):
         if root.id is not None:
             return graphene.Node.get_node_from_global_id(_info, root.id)
         return get_user_model().objects.get(email=root.email)
+
+    @staticmethod
+    def resolve_vendor_id(root: models.User, info, **_kwargs):
+        return root.vendor.id
 
 
 class ChoiceValue(graphene.ObjectType):

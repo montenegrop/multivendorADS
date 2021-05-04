@@ -167,6 +167,7 @@ class User(PermissionsMixin, ModelWithMetadata, AbstractBaseUser):
     PASSPORT = 'pasaporte'
 
     TYPES_OF_IDENTIFICATION = [
+        ('', 'none'),
         (DNI, 'DNI'),
         (PASSPORT, 'pasaporte'),
     ]
