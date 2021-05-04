@@ -181,6 +181,7 @@ class VendorRegister(ModelMutation):
 
     class Meta:
         description = "Creates a new vendor."
+        permissions = ("is_superuser")
         # exclude = ["password"]
         model = VendorModel
         # error_type_class = AccountError
