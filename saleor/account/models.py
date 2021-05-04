@@ -163,6 +163,22 @@ class User(PermissionsMixin, ModelWithMetadata, AbstractBaseUser):
         Vendor, related_name="users", null=True, on_delete=models.CASCADE
     )
 
+    DNI = 'DNI'
+    PASSPORT = 'pasaporte'
+
+    types_of_identification = [
+        (DNI, 'DNI'),
+        (PASSPORT, 'pasaporte'),
+    ]
+
+    type_of_identification = models.CharField(
+        max_length=30,
+        choices=ROLES,
+        blank=True
+    )
+
+    identification = models.CharField(max_length=30, blank=True)
+
     class Meta:
         ordering = ("email",)
         permissions = (
