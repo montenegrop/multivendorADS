@@ -166,14 +166,14 @@ class User(PermissionsMixin, ModelWithMetadata, AbstractBaseUser):
     DNI = 'DNI'
     PASSPORT = 'pasaporte'
 
-    types_of_identification = [
+    TYPES_OF_IDENTIFICATION = [
         (DNI, 'DNI'),
         (PASSPORT, 'pasaporte'),
     ]
 
     type_of_identification = models.CharField(
         max_length=30,
-        choices=ROLES,
+        choices=TYPES_OF_IDENTIFICATION,
         blank=True
     )
 
