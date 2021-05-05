@@ -36,7 +36,7 @@ class Vendor(ModelWithMetadata):
     address = models.CharField(max_length=40, blank=True)
 
     # fields de ubicacion:
-    location = models.ForeignKey(VendorLocation, on_delete=models.CASCADE)
+    location = models.ForeignKey(VendorLocation, on_delete=models.CASCADE, null=True)
 
 
 class VendorContact(models.Model):
