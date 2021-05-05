@@ -6,6 +6,13 @@ from saleor.core.models import ModelWithMetadata, SortableModel
 # Create your models here.
 
 
+class VendorLocation(models.Model):
+    country = models.CharField(max_length=3, blank=True, default='AR')
+    province = models.CharField(max_length=40, blank=True)
+    city = models.CharField(max_length=40, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+
+
 class Vendor(ModelWithMetadata):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=55, unique=True, allow_unicode=True)
@@ -27,6 +34,9 @@ class Vendor(ModelWithMetadata):
     website_url = models.CharField(max_length=90, blank=True)
     phone = models.CharField(max_length=40, blank=True)
     address = models.CharField(max_length=40, blank=True)
+
+    # fields de ubicacion:
+    location = models.ForeignKey(VendorLocation, on_delete=models.CASCADE)
 
 
 class VendorContact(models.Model):
