@@ -182,6 +182,8 @@ class User(PermissionsMixin, ModelWithMetadata, AbstractBaseUser):
 
     identification = models.CharField(max_length=30, blank=True)
 
+    phone = models.CharField(max_length=35, blank=True)
+
     class Meta:
         ordering = ("email",)
         permissions = (
