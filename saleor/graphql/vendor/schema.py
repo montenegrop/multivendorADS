@@ -33,7 +33,7 @@ from saleor.graphql.core.fields import (
     PrefetchingConnectionField,
 )
 
-from saleor.graphql.vendor.types.vendors import VendorImage, VendorContact
+from saleor.graphql.vendor.types.vendors import VendorImage, VendorContact, VendorLocation
 
 
 from saleor.graphql.core.connection import CountableDjangoObjectType
@@ -64,6 +64,8 @@ class Vendor(CountableDjangoObjectType):
     contacts = graphene.List(
         lambda: VendorContact, description="List of contacts for the vendor."
     )
+
+    location = graphene.Field(VendorLocation, description="Vendor location")
 
     class Meta:
         description = "Represents a vendor in the storefront."

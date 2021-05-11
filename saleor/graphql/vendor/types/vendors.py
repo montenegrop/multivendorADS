@@ -11,6 +11,13 @@ from saleor.graphql.core.connection import CountableDjangoObjectType
 
 
 @key(fields="id")
+class VendorLocation(DjangoObjectType):
+
+    class Meta:
+        model = models.VendorLocation
+
+
+@key(fields="id")
 class VendorContact(DjangoObjectType):
 
     class Meta:
