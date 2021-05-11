@@ -74,6 +74,9 @@ input AccountInput {
   lastName: String
   defaultBillingAddress: AddressInput
   defaultShippingAddress: AddressInput
+  typeOfIdentification: String
+  identification: String
+  phone: String
   vendorSlug: String
 }
 
@@ -88,6 +91,7 @@ input AccountRegisterInput {
   email: String!
   password: String!
   redirectUrl: String
+  modelId: Int
 }
 
 type AccountRequestDeletion {
@@ -701,6 +705,7 @@ type Category implements Node & ObjectWithMetadata {
   descriptionJson: JSONString!
   slug: String!
   parent: Category
+  relevance: Int!
   level: Int!
   privateMetadata: [MetadataItem]!
   metadata: [MetadataItem]!
@@ -716,6 +721,11 @@ type CategoryBulkDelete {
   errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
   count: Int!
   productErrors: [ProductError!]!
+}
+
+type CategoryBulkRelevanceSort {
+  errors: [String]
+  success: Boolean
 }
 
 type CategoryCountableConnection {
@@ -760,6 +770,7 @@ enum CategorySortField {
   NAME
   PRODUCT_COUNT
   SUBCATEGORY_COUNT
+  RELEVANCE
 }
 
 input CategorySortingInput {
@@ -1296,15 +1307,14 @@ type ConfirmEmailChange {
 
 enum CountryCode {
   AF
-  AX
   AL
-  DZ
-  AS
-  AD
+  DE
   AO
   AI
   AQ
   AG
+  SA
+  DZ
   AR
   AM
   AW
@@ -1312,99 +1322,110 @@ enum CountryCode {
   AT
   AZ
   BS
-  BH
   BD
   BB
-  BY
+  BH
   BE
   BZ
   BJ
   BM
-  BT
+  BY
+  MM
   BO
   BQ
   BA
   BW
-  BV
   BR
-  IO
   BN
   BG
   BF
   BI
+  BT
   CV
   KH
   CM
   CA
-  KY
-  CF
-  TD
+  QA
+  CZ
   CL
   CN
-  CX
-  CC
   CO
   KM
   CG
-  CD
-  CK
+  KP
+  KR
   CR
   CI
   HR
   CU
   CW
-  CY
-  CZ
   DK
-  DJ
   DM
-  DO
   EC
   EG
   SV
-  GQ
+  AE
   ER
+  SK
+  SI
+  ES
+  PS
+  FM
+  US
   EE
-  SZ
   ET
   EU
-  FK
-  FO
-  FJ
+  PH
   FI
+  FJ
   FR
-  GF
-  PF
-  TF
   GA
   GM
   GE
-  DE
   GH
   GI
+  GD
   GR
   GL
-  GD
   GP
   GU
   GT
+  GF
   GG
   GN
+  GQ
   GW
   GY
   HT
-  HM
-  VA
   HN
   HK
   HU
-  IS
   IN
   ID
-  IR
   IQ
+  IR
   IE
+  BV
+  NF
   IM
+  CX
+  IS
+  KY
+  CC
+  CK
+  FO
+  GS
+  HM
+  FK
+  MP
+  MH
+  PN
+  SB
+  TC
+  UM
+  VG
+  VI
+  AX
   IL
   IT
   JM
@@ -1413,135 +1434,125 @@ enum CountryCode {
   JO
   KZ
   KE
+  KG
   KI
   KW
-  KG
   LA
+  LS
   LV
   LB
-  LS
   LR
   LY
   LI
   LT
   LU
   MO
+  MK
   MG
-  MW
   MY
+  MW
   MV
   ML
   MT
-  MH
+  MA
   MQ
-  MR
   MU
+  MR
   YT
   MX
-  FM
   MD
   MC
   MN
   ME
   MS
-  MA
   MZ
-  MM
   NA
   NR
   NP
-  NL
-  NC
-  NZ
   NI
   NE
   NG
   NU
-  NF
-  KP
-  MK
-  MP
   NO
+  NC
+  NZ
   OM
+  NL
   PK
   PW
-  PS
   PA
   PG
   PY
   PE
-  PH
-  PN
+  PF
   PL
   PT
+  AD
   PR
-  QA
+  GB
+  CD
+  DO
+  TZ
+  CF
+  CY
+  DJ
+  TD
   RE
+  RW
   RO
   RU
-  RW
+  EH
+  WS
+  AS
   BL
-  SH
   KN
-  LC
+  SM
   MF
+  SX
   PM
   VC
-  WS
-  SM
+  SH
+  LC
+  VA
   ST
-  SA
   SN
   RS
   SC
   SL
   SG
-  SX
-  SK
-  SI
-  SB
+  SY
   SO
-  ZA
-  GS
-  KR
-  SS
-  ES
   LK
+  SZ
+  ZA
   SD
-  SR
-  SJ
+  SS
   SE
   CH
-  SY
+  SR
+  SJ
+  TH
   TW
   TJ
-  TZ
-  TH
+  IO
+  TF
   TL
   TG
   TK
   TO
   TT
   TN
-  TR
   TM
-  TC
+  TR
   TV
-  UG
   UA
-  AE
-  GB
-  UM
-  US
+  UG
   UY
   UZ
   VU
   VE
   VN
-  VG
-  VI
   WF
-  EH
   YE
   ZM
   ZW
@@ -2162,8 +2173,8 @@ input IntRangeInput {
 }
 
 type Invoice implements ObjectWithMetadata & Job & Node {
-  id: ID!
   metadata: [MetadataItem]!
+  id: ID!
   status: JobStatusEnum!
   number: String
   externalUrl: String
@@ -2562,7 +2573,7 @@ input MoveProductInput {
 }
 
 type Mutation {
-  vendorCreate(input: VendorInput!): VendorRegister
+  vendorCreate(id: ID, input: VendorInput!): VendorRegister
   webhookCreate(input: WebhookCreateInput!): WebhookCreate
   webhookDelete(id: ID!): WebhookDelete
   webhookUpdate(id: ID!, input: WebhookUpdateInput!): WebhookUpdate
@@ -2601,6 +2612,7 @@ type Mutation {
   categoryCreate(input: CategoryInput!, parent: ID): CategoryCreate
   categoryDelete(id: ID!): CategoryDelete
   categoryBulkDelete(ids: [ID]!): CategoryBulkDelete
+  categoryBulkRelevanceSort(ids: [ID]!): CategoryBulkRelevanceSort
   categoryUpdate(id: ID!, input: CategoryInput!): CategoryUpdate
   categoryTranslate(id: ID!, input: TranslationInput!, languageCode: LanguageCodeEnum!): CategoryTranslate
   collectionAddProducts(collectionId: ID!, products: [ID]!): CollectionAddProducts
@@ -2788,7 +2800,7 @@ type Mutation {
   accountAddressDelete(id: ID!): AccountAddressDelete
   accountSetDefaultAddress(id: ID!, type: AddressTypeEnum!): AccountSetDefaultAddress
   accountRegister(input: AccountRegisterInput!): AccountRegister
-  accountUpdate(input: AccountInput!): AccountUpdate
+  accountUpdate(id: ID, input: AccountInput!): AccountUpdate
   accountRequestDeletion(redirectUrl: String!): AccountRequestDeletion
   accountDelete(token: String!): AccountDelete
   addressCreate(input: AddressInput!, userId: ID!): AddressCreate
@@ -3962,6 +3974,7 @@ input ProductFilterInput {
   minimalPrice: PriceRangeInput
   productTypes: [ID]
   ids: [ID]
+  vendors: [ID]
   channel: String
 }
 
@@ -4377,7 +4390,8 @@ input PublishableChannelListingInput {
 }
 
 type Query {
-  vendors: [VendorType]
+  vendors(sortBy: VendorSortingInput, before: String, after: String, first: Int, last: Int): VendorCountableConnection
+  vendor(id: ID): Vendor
   webhook(id: ID!): Webhook
   webhookEvents: [WebhookEvent]
   webhookSamplePayload(eventType: WebhookSampleEventTypeEnum!): JSONString
@@ -5304,6 +5318,9 @@ type User implements Node & ObjectWithMetadata {
   dateJoined: DateTime!
   defaultShippingAddress: Address
   defaultBillingAddress: Address
+  typeOfIdentification: UserTypeOfIdentification
+  identification: String!
+  phone: String!
   privateMetadata: [MetadataItem]!
   metadata: [MetadataItem]!
   addresses: [Address]
@@ -5318,6 +5335,7 @@ type User implements Node & ObjectWithMetadata {
   avatar(size: Int): Image
   events: [CustomerEvent]
   storedPaymentSources: [PaymentSource]
+  vendorId: ID
 }
 
 type UserAvatarDelete {
@@ -5378,6 +5396,12 @@ input UserSortingInput {
   field: UserSortField!
 }
 
+enum UserTypeOfIdentification {
+  EMPTY
+  DNI
+  PASAPORTE
+}
+
 type VAT {
   countryCode: String!
   standardRate: Float
@@ -5413,25 +5437,96 @@ type VariantPricingInfo {
   priceLocalCurrency: TaxedMoney
 }
 
+type Vendor implements Node & ObjectWithMetadata {
+  id: ID!
+  name: String!
+  slug: String!
+  relevance: Int!
+  description: String!
+  bussiness: String!
+  foundingYear: Int
+  totalEmployess: Int
+  qualityNorms: String!
+  openHours: String!
+  billing: String!
+  websiteUrl: String!
+  phone: String!
+  address: String!
+  privateMetadata: [MetadataItem]!
+  metadata: [MetadataItem]!
+  mainImage(size: Int): Image
+  images: [VendorImage]
+  mainCategories: [Category]
+  contacts: [VendorContact]
+  location: VendorLocation
+}
+
+type VendorContact {
+  id: ID!
+  Vendor: Vendor!
+  name: String!
+  phone: String!
+  email: String!
+  role: VendorContactRole
+}
+
+enum VendorContactRole {
+  A_
+  SALES
+  PURCHASING
+  INDEFINITE
+}
+
+type VendorCountableConnection {
+  pageInfo: PageInfo!
+  edges: [VendorCountableEdge!]!
+  totalCount: Int
+}
+
+type VendorCountableEdge {
+  node: Vendor!
+  cursor: String!
+}
+
+type VendorImage implements Node {
+  sortOrder: Int
+  id: ID!
+  alt: String!
+  title: String!
+  url(size: Int): String!
+}
+
 input VendorInput {
   description: String
   name: String
   slug: String
-  id: ID
+}
+
+type VendorLocation {
+  id: ID!
+  country: String!
+  province: String!
+  city: String!
+  postalCode: String!
+  lat: String!
+  lon: String!
+  vendorSet(before: String, after: String, first: Int, last: Int): VendorCountableConnection!
 }
 
 type VendorRegister {
   errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
-  vendor: VendorType
+  vendor: Vendor
 }
 
-type VendorType {
-  id: ID!
-  name: String!
-  slug: String!
-  description: String!
-  users(before: String, after: String, first: Int, last: Int): UserCountableConnection!
-  products(before: String, after: String, first: Int, last: Int): ProductCountableConnection!
+enum VendorSortField {
+  NAME
+  RELEVANCE
+}
+
+input VendorSortingInput {
+  direction: OrderDirection!
+  channel: String
+  field: VendorSortField!
 }
 
 type VerifyToken {
@@ -5838,7 +5933,7 @@ enum WeightUnitsEnum {
 
 scalar _Any
 
-union _Entity = Address | User | Group | App | ProductVariant | Product | ProductType | Collection | Category | ProductImage | PageType
+union _Entity = ProductVariant | Product | ProductType | Collection | Category | ProductImage | VendorLocation | VendorContact | VendorImage | Vendor | Address | User | Group | App | PageType
 
 type _Service {
   sdl: String
