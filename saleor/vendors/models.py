@@ -11,6 +11,8 @@ class VendorLocation(models.Model):
     province = models.CharField(max_length=40, blank=True)
     city = models.CharField(max_length=40, blank=True)
     postal_code = models.CharField(max_length=20, blank=True)
+    lat = models.CharField(max_length=20, blank=True)
+    lon = models.CharField(max_length=20, blank=True)
 
 
 class Vendor(ModelWithMetadata):
