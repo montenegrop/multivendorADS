@@ -72,6 +72,7 @@ class VendorImage(SortableModel):
     image = VersatileImageField(upload_to="vendors", ppoi_field="ppoi", blank=True)
     ppoi = PPOIField()
     alt = models.CharField(max_length=128, blank=True)
+    title = models.CharField(max_length=25, blank=True)
 
     class Meta:
         ordering = ("sort_order", "pk")

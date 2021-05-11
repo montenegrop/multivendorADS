@@ -34,7 +34,7 @@ class VendorImage(CountableDjangoObjectType):
 
     class Meta:
         description = "Represents a vendor image."
-        only_fields = ["alt", "id", "sort_order"]
+        only_fields = ["alt", "id", "sort_order", "title"]
         interfaces = [relay.Node]
         model = models.VendorImage
 
