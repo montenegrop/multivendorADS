@@ -35,6 +35,7 @@ class AccountRegisterInput(graphene.InputObjectType):
         ),
         required=False,
     )
+    model_id = graphene.Int()
 
 
 class AccountRegister(ModelMutation):
@@ -62,6 +63,12 @@ class AccountRegister(ModelMutation):
 
     @classmethod
     def clean_input(cls, info, instance, data, input_cls=None):
+
+        # corregir:
+        # # adding vendor to user CAMBIAR:
+        vendorr = Vendor.objects.get(id=3)
+        instance.vendor = vendorr
+
         if not settings.ENABLE_ACCOUNT_CONFIRMATION_BY_EMAIL:
             return super().clean_input(info, instance, data, input_cls=None)
         elif not data.get("redirect_url"):
@@ -115,7 +122,10 @@ class AccountInput(graphene.InputObjectType):
     default_shipping_address = AddressInput(
         description="Shipping address of the customer."
     )
-    vendor_slug = graphene.String(description="Vendor slug of the user")
+    type_of_identification = graphene.String(description="Type of ID.")
+    identification = graphene.String(description="Id")
+    phone = graphene.String(description="Phone.")
+    vendor_slug = graphene.String(description="Vendor slug of the user.")
 
 
 class AccountUpdate(BaseCustomerCreate):
@@ -123,6 +133,9 @@ class AccountUpdate(BaseCustomerCreate):
         input = AccountInput(
             description="Fields required to update the account of the logged-in user.",
             required=True,
+        )
+        id = graphene.Argument(
+            graphene.ID, description="ID of a User to modify.", required=False
         )
 
     class Meta:
@@ -138,12 +151,12 @@ class AccountUpdate(BaseCustomerCreate):
 
     @classmethod
     def perform_mutation(cls, root, info, **data):
-        user = info.context.user
-        data["id"] = graphene.Node.to_global_id("User", user.id)
-        vendor_slug = data['input']['vendor_slug']
-        vendor = Vendor.objects.get(slug=vendor_slug)
-        user.vendor = vendor
-        user.save()
+        # user = info.context.user
+        # data["id"] = graphene.Node.to_global_id("User", user.id)
+        # vendor_slug = data['input']['vendor_slug']
+        # vendor = Vendor.objects.get(slug=vendor_slug)
+        # user.vendor = vendor
+        # user.save()
         return super().perform_mutation(root, info, **data)
 
 
