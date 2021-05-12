@@ -35,7 +35,6 @@ class AccountRegisterInput(graphene.InputObjectType):
         ),
         required=False,
     )
-    model_id = graphene.Int()
 
 
 class AccountRegister(ModelMutation):

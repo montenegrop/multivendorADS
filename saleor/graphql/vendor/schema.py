@@ -3,7 +3,7 @@ from graphene_federation import key
 from graphene import relay
 from saleor.vendors import models
 from saleor.product.models import Category as CategoryModel
-from saleor.graphql.core.types import Image
+from saleor.graphql.core.types import Image, Upload
 from saleor.graphql.core.types import ChannelSortInputObjectType
 
 from saleor.graphql.utils import get_user_or_app_from_context
@@ -170,9 +170,13 @@ class VendorInput(graphene.InputObjectType):
     description = graphene.String(description="Vendor description (HTML/text).")
     name = graphene.String(description="Vendor name.")
     slug = graphene.String(description="Vendor slug. Is unicode")
+    main_image = Upload(
+        required=False,
+        description="Represents an image file in a multipart request.",
+    )
 
 
-class VendorRegister(ModelMutation):
+class VendorRegisterOrUpdate(ModelMutation):
     class Arguments:
         id = graphene.Argument(
             graphene.ID, description="ID of a Vendor to modify.", required=False
@@ -205,4 +209,4 @@ class VendorRegister(ModelMutation):
 
 
 class VendorMutations(graphene.ObjectType):
-    vendor_create = VendorRegister.Field()
+    vendor_create = VendorRegisterOrUpdate.Field()
