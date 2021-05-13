@@ -102,15 +102,6 @@ class Vendor(CountableDjangoObjectType):
                 rendition_key_set="main_images",
                 info=info,
             )
-        else:
-            image = CategoryModel.objects.first().background_image
-            return Image.get_adjusted(
-                image=image,
-                alt="vendor-alt-FALTA",
-                size=size,
-                rendition_key_set="main_images",
-                info=info,
-            )
 
     @staticmethod
     def resolve_images(root: VendorModel, info, **_kwargs):
@@ -212,7 +203,7 @@ class VendorRegisterOrUpdate(ModelMutation):
         main_image_data = info.context.FILES.get(input_data["main_image"])
         validate_image_file(main_image_data, "image")
 
-        # corregir: (ver para que puede servir)
+        # corregir: (ver para que puede servir, borrar imagen anterior)
         image = vendor.images.create(
             image=main_image_data, alt=input_data.get("alt", ""))
 
