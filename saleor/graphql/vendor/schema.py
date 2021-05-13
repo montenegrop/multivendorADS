@@ -3,8 +3,11 @@ from graphene_federation import key
 from graphene import relay
 from saleor.vendors import models
 from saleor.product.models import Category as CategoryModel
+
 from saleor.graphql.core.types import Image, Upload
 from saleor.graphql.core.types import ChannelSortInputObjectType
+
+from saleor.graphql.core.utils import validate_image_file
 
 from saleor.graphql.utils import get_user_or_app_from_context
 
@@ -195,6 +198,19 @@ class VendorRegisterOrUpdate(ModelMutation):
 
     @classmethod
     def mutate(cls, root, info, **data):
+        data = data.get("input")
+
+        # verify if vendor to modify is user vendor:
+
+        # save mainImage to vendor:
+        vendor = cls.get_node_or_error(
+            info, data["id"], field="vendor", only_type=Vendor
+        )
+
+        main_image_data = info.context.FILES.get(data["main_image"])
+        validate_image_file(main_image_data, "image")
+
+        image = vendor.images.create(image=main_image_data, alt=data.get("alt", ""))
         response = super().mutate(root, info, **data)
         return response
 
