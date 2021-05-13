@@ -78,6 +78,7 @@ input AccountInput {
   identification: String
   phone: String
   vendorSlug: String
+  email: String
 }
 
 type AccountRegister {
@@ -91,7 +92,6 @@ input AccountRegisterInput {
   email: String!
   password: String!
   redirectUrl: String
-  modelId: Int
 }
 
 type AccountRequestDeletion {
@@ -2573,7 +2573,7 @@ input MoveProductInput {
 }
 
 type Mutation {
-  vendorCreate(id: ID, input: VendorInput!): VendorRegister
+  vendorCreate(id: ID, input: VendorInput!): VendorRegisterOrUpdate
   webhookCreate(input: WebhookCreateInput!): WebhookCreate
   webhookDelete(id: ID!): WebhookDelete
   webhookUpdate(id: ID!, input: WebhookUpdateInput!): WebhookUpdate
@@ -5449,6 +5449,7 @@ type Vendor implements Node & ObjectWithMetadata {
   qualityNorms: String!
   openHours: String!
   billing: String!
+  email: String
   websiteUrl: String!
   phone: String!
   address: String!
@@ -5500,6 +5501,7 @@ input VendorInput {
   description: String
   name: String
   slug: String
+  mainImage: Upload
 }
 
 type VendorLocation {
@@ -5513,7 +5515,7 @@ type VendorLocation {
   vendorSet(before: String, after: String, first: Int, last: Int): VendorCountableConnection!
 }
 
-type VendorRegister {
+type VendorRegisterOrUpdate {
   errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
   vendor: Vendor
 }

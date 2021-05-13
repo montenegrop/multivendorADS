@@ -89,6 +89,7 @@ class Vendor(CountableDjangoObjectType):
             "website_url",
             "phone",
             "address",
+            "email",
         ]
 
     @staticmethod

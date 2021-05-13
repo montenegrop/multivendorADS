@@ -125,6 +125,7 @@ class AccountInput(graphene.InputObjectType):
     identification = graphene.String(description="Id")
     phone = graphene.String(description="Phone.")
     vendor_slug = graphene.String(description="Vendor slug of the user.")
+    email = graphene.String(description="The email address of the user.")
 
 
 class AccountUpdate(BaseCustomerCreate):
