@@ -199,19 +199,23 @@ class VendorRegisterOrUpdate(ModelMutation):
 
     @classmethod
     def mutate(cls, root, info, **data):
-        data = data.get("input")
+        vendor_id = data.get("id")
+        input_data = data.get("input")
 
         # verify if vendor to modify is user vendor:
 
         # save mainImage to vendor:
         vendor = cls.get_node_or_error(
-            info, data["id"], field="vendor", only_type=Vendor
+            info, vendor_id, field="vendor", only_type=Vendor
         )
 
-        main_image_data = info.context.FILES.get(data["main_image"])
+        main_image_data = info.context.FILES.get(input_data["main_image"])
         validate_image_file(main_image_data, "image")
 
-        image = vendor.images.create(image=main_image_data, alt=data.get("alt", ""))
+        # corregir: (ver para que puede servir)
+        image = vendor.images.create(
+            image=main_image_data, alt=input_data.get("alt", ""))
+
         response = super().mutate(root, info, **data)
         return response
 
