@@ -33,7 +33,7 @@ class Vendor(ModelWithMetadata):
     billing = models.CharField(max_length=70, blank=True)
 
     # fields for "contacto":
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, null=True)
     website_url = models.CharField(max_length=90, blank=True)
     phone = models.CharField(max_length=40, blank=True)
     address = models.CharField(max_length=40, blank=True)
