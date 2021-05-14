@@ -68,8 +68,6 @@ class Vendor(CountableDjangoObjectType):
         lambda: VendorContact, description="List of contacts for the vendor."
     )
 
-    location = graphene.Field(VendorLocation, description="Vendor location")
-
     class Meta:
         description = "Represents a vendor in the storefront."
         interfaces = [relay.Node, ObjectWithMetadata]
@@ -90,8 +88,10 @@ class Vendor(CountableDjangoObjectType):
             "phone",
             "address",
             "email",
+            "location",
         ]
 
+    # corregir: (formato imagen banner)
     @staticmethod
     def resolve_main_image(root: VendorModel, info, size=None, **_kwargs):
         if root.main_image:
@@ -103,6 +103,7 @@ class Vendor(CountableDjangoObjectType):
                 info=info,
             )
 
+    # load toma tambien la variable 'last':
     @staticmethod
     def resolve_images(root: VendorModel, info, **_kwargs):
         return ImagesByVendorIdLoader(info.context).load(root.id)
@@ -162,13 +163,21 @@ class VendorQueries(graphene.ObjectType):
 
 
 class VendorInput(graphene.InputObjectType):
-    description = graphene.String(description="Vendor description (HTML/text).")
-    name = graphene.String(description="Vendor name.")
-    slug = graphene.String(description="Vendor slug. Is unicode")
+    # corregir: (no modificable por usuario)
+    slug = graphene.String(description="Vendor slug. Is unicode", required=False)
+
+    # basicos:
+    name = graphene.String(description="Vendor name.", required=False)
+    description = graphene.String(
+        description="Vendor description (HTML/text).", required=False)
+
+    # imagenes:
     main_image = Upload(
         required=False,
-        description="Represents an image file in a multipart request.",
+        description="Represents an vendor main-image file in a multipart request.",
     )
+    images = graphene.List(
+        Upload, required=False, description="Represents an vendor many images files in a multipart request.")
 
 
 class VendorRegisterOrUpdate(ModelMutation):
@@ -204,7 +213,7 @@ class VendorRegisterOrUpdate(ModelMutation):
         validate_image_file(main_image_data, "image")
 
         # corregir: (ver para que puede servir, borrar imagen anterior)
-        image = vendor.images.create(
+        create_main_image = vendor.main_image.create(
             image=main_image_data, alt=input_data.get("alt", ""))
 
         response = super().mutate(root, info, **data)
