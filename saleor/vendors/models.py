@@ -96,7 +96,7 @@ class VendorMainImage(VendorGeneralImage):
 class VendorServiceImage(VendorGeneralImage):
     vendor = models.ForeignKey(
         Vendor,
-        related_name="images",
+        related_name="service_images",
         on_delete=models.CASCADE,
     )
     title = models.CharField(max_length=25, blank=True)

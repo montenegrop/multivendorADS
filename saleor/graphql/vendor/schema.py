@@ -223,7 +223,7 @@ class VendorInput(graphene.InputObjectType):
         description="Vendor description (HTML/text).", required=False)
 
 
-class VendorRegisterOrUpdate(ModelMutation):
+class VendorCreateOrUpdate(ModelMutation):
     class Arguments:
         id = graphene.Argument(
             graphene.ID, description="ID of a Vendor to modify.", required=False
@@ -257,4 +257,4 @@ class VendorRegisterOrUpdate(ModelMutation):
 
 
 class VendorMutations(graphene.ObjectType):
-    vendor_create = VendorRegisterOrUpdate.Field()
+    vendor_create_or_update = VendorCreateOrUpdate.Field()
