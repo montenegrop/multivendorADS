@@ -5453,13 +5453,13 @@ type Vendor implements Node & ObjectWithMetadata {
   websiteUrl: String!
   phone: String!
   address: String!
+  location: VendorLocation
   privateMetadata: [MetadataItem]!
   metadata: [MetadataItem]!
   mainImage(size: Int): Image
   images: [VendorImage]
   mainCategories: [Category]
   contacts: [VendorContact]
-  location: VendorLocation
 }
 
 type VendorContact {
@@ -5494,14 +5494,27 @@ type VendorImage implements Node {
   id: ID!
   alt: String!
   title: String!
+  position: Int
   url(size: Int): String!
 }
 
+input VendorImagesInput {
+  title: String
+  position: String
+  image: Upload
+}
+
 input VendorInput {
-  description: String
-  name: String
   slug: String
+  name: String
+  description: String
   mainImage: Upload
+  images: [VendorImagesInput]
+  province: String
+  city: String
+  postalCode: String
+  lat: String
+  lon: String
 }
 
 type VendorLocation {

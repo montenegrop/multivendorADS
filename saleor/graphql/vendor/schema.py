@@ -222,8 +222,8 @@ class VendorRegisterOrUpdate(ModelMutation):
         if "main_image" in input_data.keys():
             main_image_data = info.context.FILES.get(input_data["main_image"])
             validate_image_file(main_image_data, "image")
-            create_main_image = vendor.main_image.create(
-                image=main_image_data, alt=input_data.get("alt", ""))
+            vendor.main_image = main_image_data
+            vendor.save()
 
         # save location to vendor:
         if "location" in input_data.keys():
