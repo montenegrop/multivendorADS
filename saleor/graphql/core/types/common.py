@@ -6,6 +6,7 @@ from django.conf import settings
 from ....product.templatetags.product_images import get_thumbnail
 from ...translations.enums import LanguageCodeEnum
 from ..enums import (
+    VendorErrorCode,
     AccountErrorCode,
     AppErrorCode,
     AttributeErrorCode,
@@ -75,6 +76,10 @@ class Error(graphene.ObjectType):
 
     class Meta:
         description = "Represents an error in the input of a mutation."
+
+
+class VendorError(Error):
+    code = VendorErrorCode(description="The error code.", required=True)
 
 
 class AccountError(Error):

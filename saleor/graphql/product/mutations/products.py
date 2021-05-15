@@ -512,7 +512,8 @@ T_INPUT_MAP = List[Tuple[attribute_models.Attribute, AttrValuesInput]]
 class ProductCreate(ModelMutation):
     class Arguments:
         input = ProductCreateInput(
-            required=True, description="Fields required to create a product."
+            required=True,
+            description="Fields required to create a product."
         )
 
     class Meta:

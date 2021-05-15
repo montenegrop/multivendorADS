@@ -19,7 +19,8 @@ class Vendor(ModelWithMetadata):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=55, unique=True, allow_unicode=True)
     relevance = models.IntegerField(default=0)
-    main_image = VersatileImageField(
+
+    VersatileImageField(
         upload_to="vendor-main", blank=True, null=True
     )
 
@@ -66,16 +67,10 @@ class VendorContact(models.Model):
     )
 
 
-class VendorImage(SortableModel):
-    vendor = models.ForeignKey(
-        Vendor, related_name="images", on_delete=models.CASCADE
-    )
+class VendorGeneralImage(SortableModel):
     image = VersatileImageField(upload_to="vendors", ppoi_field="ppoi", blank=True)
     ppoi = PPOIField()
     alt = models.CharField(max_length=128, blank=True)
-    title = models.CharField(max_length=25, blank=True)
-
-    position = models.IntegerField(null=True)
 
     class Meta:
         ordering = ("sort_order", "pk")
@@ -83,3 +78,22 @@ class VendorImage(SortableModel):
 
     def get_ordering_queryset(self):
         return self.vendor.images.all()
+
+
+class VendorMainImage(VendorGeneralImage):
+    vendor = models.OneToOneField(
+        Vendor,
+        related_name="main_image",
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
+
+
+class VendorImage(VendorGeneralImage):
+    vendor = models.ForeignKey(
+        Vendor,
+        related_name="images",
+        on_delete=models.CASCADE
+    )
+    title = models.CharField(max_length=25, blank=True)
+    position = models.IntegerField(null=True)

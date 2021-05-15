@@ -4,8 +4,10 @@ from graphene import relay, String
 from saleor.vendors import models
 from saleor.product.models import Category as CategoryModel
 
+
 from saleor.graphql.core.types import Image, Upload
 from saleor.graphql.core.types import ChannelSortInputObjectType
+from saleor.graphql.core.types.common import VendorError
 
 from saleor.graphql.core.utils import validate_image_file
 
@@ -36,7 +38,12 @@ from saleor.graphql.core.fields import (
     PrefetchingConnectionField,
 )
 
-from saleor.graphql.vendor.types.vendors import VendorImage, VendorContact, VendorLocation, VendorImagesInput
+from saleor.graphql.vendor.types.vendors import (
+    VendorImage,
+    VendorContact,
+    VendorLocation,
+    VendorImageCreateInput,
+)
 
 
 from saleor.graphql.core.connection import CountableDjangoObjectType
@@ -162,6 +169,50 @@ class VendorQueries(graphene.ObjectType):
         return VendorModel.objects.all()
 
 
+class ProductImageCreate(BaseMutation):
+    vendor = graphene.Field(Vendor)
+    image = graphene.Field(VendorImage)
+
+    class Arguments:
+        input = VendorImageCreateInput(
+            required=True, description="Fields required to create a product image."
+        )
+
+    # corregir: permisos y ver errores
+    class Meta:
+        description = (
+            "Create a vendor image."
+        )
+        permissions = ("is_superuser",)
+        error_type_class = VendorError
+        error_type_field = "vendor_errors"
+
+    @classmethod
+    def perform_mutation(cls, _root, info, **data):
+        data = data.get("input")
+        vendor = cls.get_node_or_error(
+            info, data["vendor"], field="vendor", only_type=Vendor
+        )
+
+        image_data = info.context.FILES.get(data["image"])
+        validate_image_file(image_data, "image")
+
+        if "position" in data.keys():
+            image = vendor.images.create(
+                image=image_data,
+                alt=data.get("alt", ""),
+                position=data.get("position"),
+                title=data.get("title", "")
+            )
+        else:
+            image = vendor.main_image.create(
+                image=image_data,
+                alt=data.get("alt", ""),
+            )
+
+        return ProductImageCreate(vendor=vendor, image=image)
+
+
 class VendorInput(graphene.InputObjectType):
     # corregir: (no modificable por usuario)
     slug = graphene.String(description="Vendor slug. Is unicode", required=False)
@@ -170,23 +221,6 @@ class VendorInput(graphene.InputObjectType):
     name = graphene.String(description="Vendor name.", required=False)
     description = graphene.String(
         description="Vendor description (HTML/text).", required=False)
-
-    # imagenes:
-    main_image = Upload(
-        required=False,
-        description="Represents an vendor main-image file in a multipart request.",
-    )
-    images = graphene.List(
-        VendorImagesInput, required=False,
-        description="Represents a vendor many images files in a multipart request.",
-    )
-
-    # ubicación:
-    province = graphene.String(description="Operating province.", required=False,)
-    city = graphene.String(description="Operating city.", required=False,)
-    postal_code = graphene.String(description="Operating postal code.", required=False,)
-    lat = graphene.String(description="Operating postal code.", required=False,)
-    lon = graphene.String(description="Operating postal code.", required=False,)
 
 
 class VendorRegisterOrUpdate(ModelMutation):
@@ -198,47 +232,17 @@ class VendorRegisterOrUpdate(ModelMutation):
             description="Fields required to create a vendor.", required=True
         )
 
+    # corregir:
     class Meta:
         description = "Creates a new vendor."
-        permissions = ("is_superuser")
+        permissions = ("is_superuser",)
         # exclude = ["password"]
         model = VendorModel
-        # error_type_class = AccountError
-        # error_type_field = "account_errors"
+        error_type_class = VendorError
+        error_type_field = "vendor_errors"
 
     @classmethod
     def mutate(cls, root, info, **data):
-        vendor_id = data.get("id")
-        input_data = data.get("input")
-
-        if vendor_id:
-            vendor = cls.get_node_or_error(
-                info, vendor_id, field="vendor", only_type=Vendor
-            )
-
-        # verify if vendor to modify is user vendor:
-
-        # save mainImage to vendor:
-        if "main_image" in input_data.keys():
-            main_image_data = info.context.FILES.get(input_data["main_image"])
-            validate_image_file(main_image_data, "image")
-            vendor.main_image = main_image_data
-            vendor.save()
-
-        # save location to vendor:
-        if "location" in input_data.keys():
-            pass
-
-        # save images to vendor:
-        if "images" in input_data.keys():
-            images_data = info.context.FILES.get(input_data["images"])
-            for image in images_data:
-                validate_image_file(image, "image")
-                create_image = vendor.main_image.create(
-                    image=image, alt=input_data.get("alt", ""))
-
-        # corregir: (ver para que puede servir, borrar imagen anterior)
-
         response = super().mutate(root, info, **data)
         return response
 

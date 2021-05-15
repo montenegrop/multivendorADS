@@ -1,5 +1,7 @@
 import graphene
 
+from saleor.vendors import error_codes as vendor_error_codes
+
 from ...account import error_codes as account_error_codes
 from ...app import error_codes as app_error_codes
 from ...attribute import error_codes as attribute_error_codes
@@ -26,7 +28,6 @@ from ...wishlist import error_codes as wishlist_error_codes
 from ..shop import error_codes as shop_error_codes
 from .utils import str_to_enum
 
-from saleor.vendors import error_codes as vendor_error_codes
 
 # FIXME CoreTaxRateType should be removed after we will drop old api fields dedicated
 #  to taxes

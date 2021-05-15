@@ -25,10 +25,14 @@ class VendorContact(DjangoObjectType):
         model = models.VendorContact
 
 
-class VendorImagesInput(graphene.InputObjectType):
+class VendorImageCreateInput(graphene.InputObjectType):
+    vendor = graphene.ID(
+        required=True, description="ID of a vendor.", name="vendor"
+    )
+    image = Upload(required=True, description="Image file.")
     title = graphene.String(required=False, description="Image title.")
     position = graphene.String(required=False, description="Image position.")
-    image = Upload(required=False, description="Image file.")
+    alt = graphene.String(required=False, description="Alt text for an image.")
 
 
 @key(fields="id")
