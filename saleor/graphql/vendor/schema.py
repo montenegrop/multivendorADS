@@ -229,11 +229,11 @@ class VendorRegisterOrUpdate(ModelMutation):
                 image=main_image_data, alt=input_data.get("alt", ""))
 
         # save location to vendor:
-        if input_data["location"]:
+        if "location" in input_data.keys():
             pass
 
         # save images to vendor:
-        if input_data["images"]:
+        if "images" in input_data.keys():
             images_data = info.context.FILES.get(input_data["images"])
             for image in images_data:
                 validate_image_file(image, "image")
