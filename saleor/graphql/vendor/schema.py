@@ -181,13 +181,15 @@ class VendorInput(graphene.InputObjectType):
         description="Represents a vendor many images files in a multipart request.",
     )
 
-    modified_images_position = graphene.List(
+    modified_images_positions = graphene.List(
         String, description="Position of modified images.")
 
     # ubicación:
     province = graphene.String(description="Operating province.", required=False,)
     city = graphene.String(description="Operating city.", required=False,)
     postal_code = graphene.String(description="Operating postal code.", required=False,)
+    lat = graphene.String(description="Operating postal code.", required=False,)
+    lon = graphene.String(description="Operating postal code.", required=False,)
 
 
 class VendorRegisterOrUpdate(ModelMutation):
@@ -220,7 +222,7 @@ class VendorRegisterOrUpdate(ModelMutation):
         # verify if vendor to modify is user vendor:
 
         # save mainImage to vendor:
-        if input_data["main_image"]:
+        if "main_image" in input_data.keys():
             main_image_data = info.context.FILES.get(input_data["main_image"])
             validate_image_file(main_image_data, "image")
             create_main_image = vendor.main_image.create(
