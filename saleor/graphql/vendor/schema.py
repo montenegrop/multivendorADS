@@ -1,6 +1,6 @@
 import graphene
 from graphene_federation import key
-from graphene import relay
+from graphene import relay, String
 from saleor.vendors import models
 from saleor.product.models import Category as CategoryModel
 
@@ -177,7 +177,16 @@ class VendorInput(graphene.InputObjectType):
         description="Represents an vendor main-image file in a multipart request.",
     )
     images = graphene.List(
-        Upload, required=False, description="Represents an vendor many images files in a multipart request.")
+        Upload, required=False,
+        description="Represents a vendor many images files in a multipart request.",
+    )
+
+    modified_images = graphene.List(String, "Position of modified images.")
+
+    # ubicación:
+    province = graphene.String(description="Operating province.", required=False,)
+    city = graphene.String(description="Operating city.", required=False,)
+    postal_code = graphene.String(description="Operating postal code.", required=False,)
 
 
 class VendorRegisterOrUpdate(ModelMutation):
@@ -202,19 +211,33 @@ class VendorRegisterOrUpdate(ModelMutation):
         vendor_id = data.get("id")
         input_data = data.get("input")
 
+        if vendor_id:
+            vendor = cls.get_node_or_error(
+                info, vendor_id, field="vendor", only_type=Vendor
+            )
+
         # verify if vendor to modify is user vendor:
 
         # save mainImage to vendor:
-        vendor = cls.get_node_or_error(
-            info, vendor_id, field="vendor", only_type=Vendor
-        )
+        if input_data["main_image"]:
+            main_image_data = info.context.FILES.get(input_data["main_image"])
+            validate_image_file(main_image_data, "image")
+            create_main_image = vendor.main_image.create(
+                image=main_image_data, alt=input_data.get("alt", ""))
 
-        main_image_data = info.context.FILES.get(input_data["main_image"])
-        validate_image_file(main_image_data, "image")
+        # save location to vendor:
+        if input_data["location"]:
+            pass
+
+        # save images to vendor:
+        if input_data["images"]:
+            images_data = info.context.FILES.get(input_data["images"])
+            for image in images_data:
+                validate_image_file(image, "image")
+                create_image = vendor.main_image.create(
+                    image=image, alt=input_data.get("alt", ""))
 
         # corregir: (ver para que puede servir, borrar imagen anterior)
-        create_main_image = vendor.main_image.create(
-            image=main_image_data, alt=input_data.get("alt", ""))
 
         response = super().mutate(root, info, **data)
         return response

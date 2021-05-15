@@ -75,6 +75,8 @@ class VendorImage(SortableModel):
     alt = models.CharField(max_length=128, blank=True)
     title = models.CharField(max_length=25, blank=True)
 
+    position = models.IntegerField(null=True)
+
     class Meta:
         ordering = ("sort_order", "pk")
         app_label = "vendors"
