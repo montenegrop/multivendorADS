@@ -36,7 +36,7 @@ from saleor.graphql.core.fields import (
     PrefetchingConnectionField,
 )
 
-from saleor.graphql.vendor.types.vendors import VendorImage, VendorContact, VendorLocation
+from saleor.graphql.vendor.types.vendors import VendorImage, VendorContact, VendorLocation, VendorImagesInput
 
 
 from saleor.graphql.core.connection import CountableDjangoObjectType
@@ -177,12 +177,9 @@ class VendorInput(graphene.InputObjectType):
         description="Represents an vendor main-image file in a multipart request.",
     )
     images = graphene.List(
-        Upload, required=False,
+        VendorImagesInput, required=False,
         description="Represents a vendor many images files in a multipart request.",
     )
-
-    modified_images_positions = graphene.List(
-        String, description="Position of modified images.")
 
     # ubicación:
     province = graphene.String(description="Operating province.", required=False,)

@@ -4,6 +4,7 @@ from graphene_federation import key
 from graphene import relay
 from graphene_django.types import DjangoObjectType
 from saleor.vendors import models
+from saleor.graphql.core.types import Upload
 
 # from saleor.product.templatetags.product_images import get_thumbnail
 
@@ -22,6 +23,12 @@ class VendorContact(DjangoObjectType):
 
     class Meta:
         model = models.VendorContact
+
+
+class VendorImagesInput(graphene.InputObjectType):
+    title = graphene.String(required=False, description="Image title.")
+    position = graphene.String(required=False, description="Image position.")
+    image = Upload(required=False, description="Image file.")
 
 
 @key(fields="id")
