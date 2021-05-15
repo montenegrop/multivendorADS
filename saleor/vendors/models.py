@@ -68,7 +68,11 @@ class VendorContact(models.Model):
 
 
 class VendorGeneralImage(SortableModel):
-    image = VersatileImageField(upload_to="vendors", ppoi_field="ppoi", blank=True)
+    image = VersatileImageField(
+        upload_to="vendors",
+        ppoi_field="ppoi",
+        blank=True,
+    )
     ppoi = PPOIField()
     alt = models.CharField(max_length=128, blank=True)
 
@@ -85,7 +89,7 @@ class VendorMainImage(VendorGeneralImage):
         Vendor,
         related_name="main_image",
         on_delete=models.CASCADE,
-        primary_key=True
+        primary_key=True,
     )
 
 
@@ -93,7 +97,7 @@ class VendorImage(VendorGeneralImage):
     vendor = models.ForeignKey(
         Vendor,
         related_name="images",
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     title = models.CharField(max_length=25, blank=True)
     position = models.IntegerField(null=True)
