@@ -100,4 +100,4 @@ class VendorImage(VendorGeneralImage):
         on_delete=models.CASCADE,
     )
     title = models.CharField(max_length=25, blank=True)
-    position = models.IntegerField(null=True)
+    position = models.IntegerField()
