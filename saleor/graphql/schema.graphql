@@ -2573,7 +2573,7 @@ input MoveProductInput {
 }
 
 type Mutation {
-  vendorCreate(id: ID, input: VendorInput!): VendorRegisterOrUpdate
+  vendorCreateOrUpdate(id: ID, input: VendorInput!): VendorCreateOrUpdate
   webhookCreate(input: WebhookCreateInput!): WebhookCreate
   webhookDelete(id: ID!): WebhookDelete
   webhookUpdate(id: ID!, input: WebhookUpdateInput!): WebhookUpdate
@@ -5489,32 +5489,43 @@ type VendorCountableEdge {
   cursor: String!
 }
 
+type VendorCreateOrUpdate {
+  errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
+  vendorErrors: [VendorError!]!
+  vendor: Vendor
+}
+
+type VendorError {
+  field: String
+  message: String
+  code: VendorErrorCode!
+}
+
+enum VendorErrorCode {
+  ALREADY_EXISTS
+  DUPLICATED_INPUT_ITEM
+  GRAPHQL_ERROR
+  INVALID
+  NOT_VENDOR_MAIN_IMAGE
+  NOT_VENDOR_IMAGES
+  NOT_FOUND
+  REQUIRED
+  UNIQUE
+}
+
 type VendorImage implements Node {
   sortOrder: Int
   id: ID!
   alt: String!
   title: String!
-  position: Int
+  position: Int!
   url(size: Int): String!
-}
-
-input VendorImagesInput {
-  title: String
-  position: String
-  image: Upload
 }
 
 input VendorInput {
   slug: String
   name: String
   description: String
-  mainImage: Upload
-  images: [VendorImagesInput]
-  province: String
-  city: String
-  postalCode: String
-  lat: String
-  lon: String
 }
 
 type VendorLocation {
@@ -5526,11 +5537,6 @@ type VendorLocation {
   lat: String!
   lon: String!
   vendorSet(before: String, after: String, first: Int, last: Int): VendorCountableConnection!
-}
-
-type VendorRegisterOrUpdate {
-  errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
-  vendor: Vendor
 }
 
 enum VendorSortField {
