@@ -181,7 +181,8 @@ class VendorInput(graphene.InputObjectType):
         description="Represents a vendor many images files in a multipart request.",
     )
 
-    modified_images = graphene.List(String, "Position of modified images.")
+    modified_images_position = graphene.List(
+        String, description="Position of modified images.")
 
     # ubicación:
     province = graphene.String(description="Operating province.", required=False,)
