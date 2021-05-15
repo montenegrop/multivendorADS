@@ -47,10 +47,10 @@ class VendorImage(CountableDjangoObjectType):
         description = "Represents a vendor image."
         only_fields = ["alt", "id", "sort_order", "title", "position"]
         interfaces = [relay.Node]
-        model = models.VendorImage
+        model = models.VendorServiceImage
 
     @staticmethod
-    def resolve_url(root: models.VendorImage, info, *, size=None):
+    def resolve_url(root: models.VendorServiceImage, info, *, size=None):
         if size:
             pass
             # url = get_thumbnail(root.image, size, method="thumbnail")

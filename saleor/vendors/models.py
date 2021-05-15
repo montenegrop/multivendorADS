@@ -93,7 +93,7 @@ class VendorMainImage(VendorGeneralImage):
     )
 
 
-class VendorImage(VendorGeneralImage):
+class VendorServiceImage(VendorGeneralImage):
     vendor = models.ForeignKey(
         Vendor,
         related_name="images",

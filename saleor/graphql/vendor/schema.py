@@ -178,7 +178,7 @@ class ProductImageCreate(BaseMutation):
             required=True, description="Fields required to create a product image."
         )
 
-    # corregir: permisos y ver errores
+    # corregir: permisos (solo servicios?) y ver errores
     class Meta:
         description = (
             "Create a vendor image."
@@ -198,7 +198,7 @@ class ProductImageCreate(BaseMutation):
         validate_image_file(image_data, "image")
 
         if "position" in data.keys():
-            image = vendor.images.create(
+            image = vendor.service_images.create(
                 image=image_data,
                 alt=data.get("alt", ""),
                 position=data.get("position"),
