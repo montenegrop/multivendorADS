@@ -205,7 +205,7 @@ class VendorImageCreateInput(graphene.InputObjectType):
 
 
 class VendorLocationCreateOrUpdateInput(graphene.InputObjectType):
-    provice = graphene.String(description="Vendor province.", required=False)
+    province = graphene.String(description="Vendor province.", required=False)
     city = graphene.String(description="Vendor city.", required=False)
     postal_code = graphene.String(description="Vendor postal code.", required=False)
     lat = graphene.String(description="Vendor lat.", required=False)
