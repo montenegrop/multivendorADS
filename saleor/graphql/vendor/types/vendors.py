@@ -30,6 +30,8 @@ from saleor.graphql.core.connection import CountableDjangoObjectType
 
 @key(fields="id")
 class VendorLocation(DjangoObjectType):
+    """ Esto funciona porque tiene el mismo nombre que la clase
+    """
 
     class Meta:
         model = models.VendorLocation
@@ -37,6 +39,8 @@ class VendorLocation(DjangoObjectType):
 
 @key(fields="id")
 class VendorContact(DjangoObjectType):
+    """ Esto funciona porque tiene el mismo nombre que la clase
+    """
 
     class Meta:
         model = models.VendorContact
@@ -96,10 +100,10 @@ class VendorServiceImage(CountableDjangoObjectType):
 @key(fields="id")
 class Vendor(CountableDjangoObjectType):
 
-    main_image_url = graphene.Field(
-        Image, size=graphene.Int(description="Size of the image."),
-        description="Banner of the vendor"
-    )
+    # main_image_url = graphene.Field(
+    #     Image, size=graphene.Int(description="Size of the image."),
+    #     description="Banner of the vendor"
+    # )
 
     service_images = graphene.List(
         lambda: VendorServiceImage, description="List of images for the vendor."
@@ -131,6 +135,7 @@ class Vendor(CountableDjangoObjectType):
             "email",
             "location",
             "contacts",
+            "main_image",
         ]
 
     # corregir: (formato imagen banner)

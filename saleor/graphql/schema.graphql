@@ -2173,8 +2173,8 @@ input IntRangeInput {
 }
 
 type Invoice implements ObjectWithMetadata & Job & Node {
-  metadata: [MetadataItem]!
   id: ID!
+  metadata: [MetadataItem]!
   status: JobStatusEnum!
   number: String
   externalUrl: String
@@ -2573,7 +2573,7 @@ input MoveProductInput {
 }
 
 type Mutation {
-  vendorCreateOrUpdate(id: ID, input: VendorInput!): VendorCreateOrUpdate
+  vendorCreateOrUpdate(id: ID, input: VendorCreateOrUpdateInput!): VendorCreateOrUpdate
   webhookCreate(input: WebhookCreateInput!): WebhookCreate
   webhookDelete(id: ID!): WebhookDelete
   webhookUpdate(id: ID!, input: WebhookUpdateInput!): WebhookUpdate
@@ -5456,26 +5456,8 @@ type Vendor implements Node & ObjectWithMetadata {
   location: VendorLocation
   privateMetadata: [MetadataItem]!
   metadata: [MetadataItem]!
-  mainImage(size: Int): Image
-  images: [VendorImage]
+  serviceImages: [VendorServiceImage]
   mainCategories: [Category]
-  contacts: [VendorContact]
-}
-
-type VendorContact {
-  id: ID!
-  Vendor: Vendor!
-  name: String!
-  phone: String!
-  email: String!
-  role: VendorContactRole
-}
-
-enum VendorContactRole {
-  A_
-  SALES
-  PURCHASING
-  INDEFINITE
 }
 
 type VendorCountableConnection {
@@ -5493,6 +5475,12 @@ type VendorCreateOrUpdate {
   errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
   vendorErrors: [VendorError!]!
   vendor: Vendor
+}
+
+input VendorCreateOrUpdateInput {
+  slug: String
+  name: String
+  description: String
 }
 
 type VendorError {
@@ -5513,21 +5501,6 @@ enum VendorErrorCode {
   UNIQUE
 }
 
-type VendorImage implements Node {
-  sortOrder: Int
-  id: ID!
-  alt: String!
-  title: String!
-  position: Int!
-  url(size: Int): String!
-}
-
-input VendorInput {
-  slug: String
-  name: String
-  description: String
-}
-
 type VendorLocation {
   id: ID!
   country: String!
@@ -5537,6 +5510,15 @@ type VendorLocation {
   lat: String!
   lon: String!
   vendorSet(before: String, after: String, first: Int, last: Int): VendorCountableConnection!
+}
+
+type VendorServiceImage implements Node {
+  sortOrder: Int
+  id: ID!
+  alt: String!
+  title: String!
+  position: Int!
+  url(size: Int): String
 }
 
 enum VendorSortField {
@@ -5954,7 +5936,7 @@ enum WeightUnitsEnum {
 
 scalar _Any
 
-union _Entity = ProductVariant | Product | ProductType | Collection | Category | ProductImage | VendorLocation | VendorContact | VendorImage | Vendor | Address | User | Group | App | PageType
+union _Entity = ProductVariant | Product | ProductType | Collection | Category | ProductImage | VendorLocation | VendorServiceImage | Vendor | Address | User | Group | App | PageType
 
 type _Service {
   sdl: String
