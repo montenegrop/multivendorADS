@@ -197,9 +197,7 @@ class VendorCreateOrUpdateInput(graphene.InputObjectType):
 
 
 class VendorImageCreateInput(graphene.InputObjectType):
-    vendor = graphene.ID(
-        required=True, description="ID of a vendor.", name="vendor"
-    )
+    vendor_id = graphene.ID(required=True, description="ID of a vendor.")
     image = Upload(required=True, description="Image file.")
     title = graphene.String(required=False, description="Image title.")
     position = graphene.String(required=False, description="Image position.")

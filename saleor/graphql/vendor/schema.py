@@ -9,7 +9,8 @@ from saleor.graphql.core.fields import (
 from saleor.graphql.vendor.types.vendors import Vendor, VendorSortingInput
 from saleor.graphql.vendor.mutations.vendors import (
     VendorCreateOrUpdate,
-    VendorLocationCreateOrUpdate
+    VendorLocationCreateOrUpdate,
+    VendorImageCreate
 )
 
 
@@ -35,3 +36,4 @@ class VendorQueries(graphene.ObjectType):
 class VendorMutations(graphene.ObjectType):
     vendor_create_or_update = VendorCreateOrUpdate.Field()
     vendor_location_create_or_update = VendorLocationCreateOrUpdate.Field()
+    vendor_image_create_or_update = VendorImageCreate.Field()

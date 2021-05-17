@@ -2574,6 +2574,8 @@ input MoveProductInput {
 
 type Mutation {
   vendorCreateOrUpdate(id: ID, input: VendorCreateOrUpdateInput!): VendorCreateOrUpdate
+  vendorLocationCreateOrUpdate(id: ID, input: VendorLocationCreateOrUpdateInput!): VendorLocationCreateOrUpdate
+  vendorImageCreateOrUpdate(input: VendorImageCreateInput): VendorImageCreate
   webhookCreate(input: WebhookCreateInput!): WebhookCreate
   webhookDelete(id: ID!): WebhookDelete
   webhookUpdate(id: ID!, input: WebhookUpdateInput!): WebhookUpdate
@@ -5336,6 +5338,7 @@ type User implements Node & ObjectWithMetadata {
   events: [CustomerEvent]
   storedPaymentSources: [PaymentSource]
   vendorId: ID
+  vendorLocationId: ID
 }
 
 type UserAvatarDelete {
@@ -5519,6 +5522,21 @@ enum VendorErrorCode {
   UNIQUE
 }
 
+type VendorImageCreate {
+  errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
+  vendor: Vendor
+  imagesUrl: String
+  vendorErrors: [VendorError!]!
+}
+
+input VendorImageCreateInput {
+  vendor: ID!
+  image: Upload!
+  title: String
+  position: String
+  alt: String
+}
+
 type VendorLocation {
   id: ID!
   country: String!
@@ -5528,6 +5546,20 @@ type VendorLocation {
   lat: String!
   lon: String!
   vendorSet(before: String, after: String, first: Int, last: Int): VendorCountableConnection!
+}
+
+type VendorLocationCreateOrUpdate {
+  errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
+  vendorErrors: [VendorError!]!
+  vendorLocation: VendorLocation
+}
+
+input VendorLocationCreateOrUpdateInput {
+  provice: String
+  city: String
+  postalCode: String
+  lat: String
+  lon: String
 }
 
 type VendorMainImage implements Node {

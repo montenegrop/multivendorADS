@@ -119,7 +119,7 @@ class VendorImageCreate(BaseMutation):
     def perform_mutation(cls, _root, info, **data):
         data = data.get("input")
         vendor = cls.get_node_or_error(
-            info, data["vendor"], field="vendor", only_type=Vendor
+            info, data["vendor_id"], field="vendor", only_type=Vendor
         )
 
         image_data = info.context.FILES.get(data["image"])
