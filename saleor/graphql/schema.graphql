@@ -5454,10 +5454,28 @@ type Vendor implements Node & ObjectWithMetadata {
   phone: String!
   address: String!
   location: VendorLocation
+  contacts: [VendorContact!]!
   privateMetadata: [MetadataItem]!
   metadata: [MetadataItem]!
+  mainImage: VendorMainImage
   serviceImages: [VendorServiceImage]
   mainCategories: [Category]
+}
+
+type VendorContact {
+  id: ID!
+  Vendor: Vendor!
+  name: String!
+  phone: String!
+  email: String!
+  role: VendorContactRole!
+}
+
+enum VendorContactRole {
+  NONE
+  SALES
+  PURCHASING
+  INDEFINITE
 }
 
 type VendorCountableConnection {
@@ -5510,6 +5528,12 @@ type VendorLocation {
   lat: String!
   lon: String!
   vendorSet(before: String, after: String, first: Int, last: Int): VendorCountableConnection!
+}
+
+type VendorMainImage implements Node {
+  id: ID!
+  alt: String!
+  url(size: Int): String
 }
 
 type VendorServiceImage implements Node {
@@ -5936,7 +5960,7 @@ enum WeightUnitsEnum {
 
 scalar _Any
 
-union _Entity = ProductVariant | Product | ProductType | Collection | Category | ProductImage | VendorLocation | VendorServiceImage | Vendor | Address | User | Group | App | PageType
+union _Entity = ProductVariant | Product | ProductType | Collection | Category | ProductImage | VendorLocation | VendorContact | VendorServiceImage | VendorMainImage | Vendor | Address | User | Group | App | PageType
 
 type _Service {
   sdl: String

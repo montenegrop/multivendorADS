@@ -204,3 +204,11 @@ class VendorImageCreateInput(graphene.InputObjectType):
     title = graphene.String(required=False, description="Image title.")
     position = graphene.String(required=False, description="Image position.")
     alt = graphene.String(required=False, description="Alt text for an image.")
+
+
+class VendorLocationCreateOrUpdateInput(graphene.InputObjectType):
+    provice = graphene.String(description="Vendor province.", required=False)
+    city = graphene.String(description="Vendor city.", required=False)
+    postal_code = graphene.String(description="Vendor postal code.", required=False)
+    lat = graphene.String(description="Vendor lat.", required=False)
+    lon = graphene.String(description="Vendor lon.", required=False)

@@ -21,7 +21,7 @@ from ..utils import format_permissions_for_display
 from ..wishlist.resolvers import resolve_wishlist_items_from_user
 from .enums import CountryCodeEnum, CustomerEventsEnum
 from .utils import can_user_manage_group, get_groups_which_user_can_manage
-from saleor.graphql.vendor.schema import Vendor
+from saleor.graphql.vendor.types.vendors import Vendor, VendorLocation
 
 
 class AddressInput(graphene.InputObjectType):
@@ -242,6 +242,7 @@ class User(CountableDjangoObjectType):
         description="List of stored payment sources.",
     )
     vendor_id = graphene.ID(description="ID of the vendor")
+    vendor_location_id = graphene.ID(description="ID of the vendor location")
 
     class Meta:
         description = "Represents user data."
@@ -372,6 +373,10 @@ class User(CountableDjangoObjectType):
     @staticmethod
     def resolve_vendor_id(root: models.User, _info, **_kwargs):
         return graphene.Node.to_global_id(Vendor._meta.name, root.vendor.id)
+
+    @staticmethod
+    def resolve_vendor_location_id(root: models.User, _info, **_kwargs):
+        return graphene.Node.to_global_id(VendorLocation._meta.name, root.vendor.location.id)
 
 
 class ChoiceValue(graphene.ObjectType):
