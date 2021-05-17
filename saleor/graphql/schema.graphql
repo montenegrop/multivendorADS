@@ -5530,7 +5530,7 @@ type VendorImageCreate {
 }
 
 input VendorImageCreateInput {
-  vendor: ID!
+  vendorId: ID!
   image: Upload!
   title: String
   position: String
