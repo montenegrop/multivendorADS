@@ -25,13 +25,11 @@ from saleor.product.models import Category as CategoryModel
 
 from saleor.graphql.core.connection import CountableDjangoObjectType
 
-# Campos auxiliares para las queries:
+# Campos de modelos para las queries:
 
 
 @key(fields="id")
 class VendorLocation(DjangoObjectType):
-    """ Esto funciona porque tiene el mismo nombre que la clase
-    """
 
     class Meta:
         model = models.VendorLocation
@@ -39,8 +37,6 @@ class VendorLocation(DjangoObjectType):
 
 @key(fields="id")
 class VendorContact(DjangoObjectType):
-    """ Esto funciona porque tiene el mismo nombre que la clase
-    """
 
     class Meta:
         model = models.VendorContact
@@ -92,18 +88,41 @@ class VendorServiceImage(CountableDjangoObjectType):
             url = root.image.url
         return info.context.build_absolute_uri(url)
 
+    # @staticmethod
+    # def __resolve_reference(root, _info, **_kwargs):
+    #     return graphene.Node.get_node_from_global_id(_info, root.id)
+
+
+@key(fields="id")
+class VendorMainImage(DjangoObjectType):
+    url = graphene.String(
+        description="The URL of the image.",
+        size=graphene.Int(description="Size of the image."),
+    )
+
+    class Meta:
+        description = "Represents a vendor main image."
+        only_fields = ["alt", "id"]
+        interfaces = [relay.Node]
+        model = models.VendorGeneralImage
+
     @staticmethod
-    def __resolve_reference(root, _info, **_kwargs):
-        return graphene.Node.get_node_from_global_id(_info, root.id)
+    def resolve_url(root: models.VendorGeneralImage, info, *, size=None):
+        if size:
+            pass
+            # url = get_thumbnail(root.image, size, method="thumbnail")
+        else:
+            url = root.image.url
+        return info.context.build_absolute_uri(url)
 
 
 @key(fields="id")
 class Vendor(CountableDjangoObjectType):
 
-    # main_image_url = graphene.Field(
-    #     Image, size=graphene.Int(description="Size of the image."),
-    #     description="Banner of the vendor"
-    # )
+    main_image = graphene.Field(
+        VendorMainImage, size=graphene.Int(description="Size of the image."),
+        description="Banner of the vendor"
+    )
 
     service_images = graphene.List(
         lambda: VendorServiceImage, description="List of images for the vendor."
@@ -135,7 +154,6 @@ class Vendor(CountableDjangoObjectType):
             "email",
             "location",
             "contacts",
-            "main_image",
         ]
 
     # corregir: (formato imagen banner)
@@ -152,7 +170,7 @@ class Vendor(CountableDjangoObjectType):
 
     # load toma tambien la variable 'last':
     @staticmethod
-    def resolve_images(root: models.Vendor, info, **_kwargs):
+    def resolve_service_images(root: models.Vendor, info, **_kwargs):
         return ImagesByVendorIdLoader(info.context).load(root.id)
 
     @staticmethod

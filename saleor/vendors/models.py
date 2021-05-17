@@ -63,7 +63,7 @@ class VendorContact(models.Model):
     )
 
 
-class VendorGeneralImage(SortableModel):
+class VendorGeneralImage(models.Model):
     image = VersatileImageField(
         upload_to="vendors",
         ppoi_field="ppoi",
@@ -72,24 +72,8 @@ class VendorGeneralImage(SortableModel):
     ppoi = PPOIField()
     alt = models.CharField(max_length=128, blank=True)
 
-    class Meta:
-        ordering = ("sort_order", "pk")
-        app_label = "vendors"
 
-    def get_ordering_queryset(self):
-        return self.vendor.images.all()
-
-
-class VendorMainImage(VendorGeneralImage):
-    vendor = models.OneToOneField(
-        Vendor,
-        related_name="main_image",
-        on_delete=models.CASCADE,
-        primary_key=True,
-    )
-
-
-class VendorServiceImage(VendorGeneralImage):
+class VendorServiceImage(VendorGeneralImage, SortableModel):
     vendor = models.ForeignKey(
         Vendor,
         related_name="service_images",
@@ -97,3 +81,18 @@ class VendorServiceImage(VendorGeneralImage):
     )
     title = models.CharField(max_length=25, blank=True)
     position = models.IntegerField()
+
+    class Meta:
+        ordering = ("sort_order", "pk")
+        app_label = "vendors"
+
+    def get_ordering_queryset(self):
+        return self.vendor.service_images.all()
+
+
+class VendorMainImage(VendorGeneralImage):
+    vendor = models.ForeignKey(
+        Vendor,
+        related_name="main_image",
+        on_delete=models.CASCADE,
+    )
