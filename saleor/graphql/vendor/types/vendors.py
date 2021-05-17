@@ -104,10 +104,10 @@ class VendorMainImage(DjangoObjectType):
         description = "Represents a vendor main image."
         only_fields = ["alt", "id"]
         interfaces = [relay.Node]
-        model = models.VendorGeneralImage
+        model = models.VendorMainImage
 
     @staticmethod
-    def resolve_url(root: models.VendorGeneralImage, info, *, size=None):
+    def resolve_url(root: models.VendorMainImage, info, *, size=None):
         if size:
             pass
             # url = get_thumbnail(root.image, size, method="thumbnail")
@@ -159,14 +159,16 @@ class Vendor(CountableDjangoObjectType):
     # corregir: (formato imagen banner)
     @staticmethod
     def resolve_main_image(root: models.Vendor, info, size=None, **_kwargs):
-        if root.main_image:
-            return Image.get_adjusted(
-                image=root.main_image,
-                alt="vendor-alt-FALTA",
-                size=size,
-                rendition_key_set="main_images",
-                info=info,
-            )
+        return ImagesByVendorIdLoader(info.context).load(root.id)
+
+        # if root.main_image:
+        #     return Image.get_adjusted(
+        #         image=root.main_image.image,
+        #         alt="vendor-alt-FALTA",
+        #         size=size,
+        #         rendition_key_set="main_images",
+        #         info=info,
+        #     )
 
     # load toma tambien la variable 'last':
     @staticmethod
