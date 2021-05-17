@@ -2,14 +2,15 @@ import graphene
 from graphql_relay import to_global_id
 from django.db import transaction
 
-from saleor.graphql.vendor.schema import Vendor
 
 from saleor.graphql.vendor.types.vendors import (
+    Vendor,
+    VendorLocation,
     VendorServiceImage,
+    # VendorMainImage,
     VendorImageCreateInput,
     VendorCreateOrUpdateInput,
     VendorLocationCreateOrUpdateInput,
-    VendorLocation,
 )
 from saleor.graphql.core.utils import validate_image_file
 from saleor.graphql.core.types.common import VendorError
@@ -18,7 +19,6 @@ from saleor.graphql.core.types.common import VendorError
 from saleor.vendors import models
 from saleor.graphql.core.mutations import (
     BaseMutation,
-    ModelDeleteMutation,
     ModelMutation
 )
 
@@ -100,7 +100,7 @@ class VendorLocationCreateOrUpdate(ModelMutation):
 
 class VendorImageCreate(BaseMutation):
     vendor = graphene.Field(Vendor)
-    image = graphene.Field(VendorServiceImage)
+    images_url = graphene.String(description="images url")
 
     class Arguments:
         input = VendorImageCreateInput(
@@ -126,16 +126,20 @@ class VendorImageCreate(BaseMutation):
         validate_image_file(image_data, "image")
 
         if "position" in data.keys():
-            image = vendor.service_images.create(
-                image=image_data,
-                alt=data.get("alt", ""),
-                position=data.get("position"),
-                title=data.get("title", "")
-            )
-        else:
-            image = vendor.main_image.create(
-                image=image_data,
-                alt=data.get("alt", ""),
-            )
 
-        return ProductImageCreate(vendor=vendor, image=image)
+            image = vendor.service_images.filter(position=int(data['position'])).last()
+            if not image:
+                image = vendor.service_images.create(position=int(data['position']))
+            image.image = image_data
+            image.alt = data.get("alt", "")
+            image.title = data.get("title", "")
+
+        else:
+            image = vendor.main_image.last()
+            if not image:
+                image = vendor.main_image.create(image=image_data)
+            image.alt = data.get("alt", "")
+
+        image_url = image.url
+
+        return VendorImageCreate(vendor=vendor, image_url=image_url)
