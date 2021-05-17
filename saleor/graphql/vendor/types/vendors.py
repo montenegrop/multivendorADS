@@ -14,7 +14,9 @@ from saleor.graphql.meta.types import ObjectWithMetadata
 
 from saleor.graphql.product.types import Category
 
-from saleor.graphql.vendor.dataloaders.vendors import ImagesByVendorIdLoader
+from saleor.graphql.vendor.dataloaders.vendors import (
+    ServiceImagesByVendorIdLoader,
+)
 
 from saleor.vendors import models
 
@@ -119,13 +121,10 @@ class VendorMainImage(DjangoObjectType):
 @key(fields="id")
 class Vendor(CountableDjangoObjectType):
 
-    main_image = graphene.Field(
-        VendorMainImage, size=graphene.Int(description="Size of the image."),
-        description="Banner of the vendor"
-    )
+    main_image = graphene.Field(VendorMainImage, description="Vendor main image.")
 
     service_images = graphene.List(
-        lambda: VendorServiceImage, description="List of images for the vendor."
+        lambda: VendorServiceImage, description="List of service images for the vendor."
     )
 
     main_categories = graphene.List(
@@ -156,24 +155,25 @@ class Vendor(CountableDjangoObjectType):
             "contacts",
         ]
 
-    # corregir: (formato imagen banner)
+    # corregir: (formato imagen banner, ver get_adjusted)
     @staticmethod
     def resolve_main_image(root: models.Vendor, info, size=None, **_kwargs):
-        return ImagesByVendorIdLoader(info.context).load(root.id)
+        if root.main_image:
+            return models.VendorMainImage.objects.filter(vendor_id=root.id).last()
 
         # if root.main_image:
         #     return Image.get_adjusted(
-        #         image=root.main_image.image,
+        #         image=root.main_image.first(),
         #         alt="vendor-alt-FALTA",
         #         size=size,
         #         rendition_key_set="main_images",
         #         info=info,
         #     )
 
-    # load toma tambien la variable 'last':
     @staticmethod
     def resolve_service_images(root: models.Vendor, info, **_kwargs):
-        return ImagesByVendorIdLoader(info.context).load(root.id)
+        ''' load toma tambien la variable last '''
+        return ServiceImagesByVendorIdLoader(info.context).load(root.id)
 
     @staticmethod
     def resolve_main_categories(root: models.Vendor, info, **_kwargs):

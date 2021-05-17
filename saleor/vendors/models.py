@@ -90,7 +90,7 @@ class VendorServiceImage(VendorGeneralImage, SortableModel):
         return self.vendor.service_images.all()
 
 
-class VendorMainImage(VendorGeneralImage):
+class VendorMainImage(VendorGeneralImage, models.Model):
     vendor = models.ForeignKey(
         Vendor,
         related_name="main_image",
