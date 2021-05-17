@@ -20,10 +20,6 @@ class Vendor(ModelWithMetadata):
     slug = models.SlugField(max_length=55, unique=True, allow_unicode=True)
     relevance = models.IntegerField(default=0)
 
-    VersatileImageField(
-        upload_to="vendor-main", blank=True, null=True
-    )
-
     # fields for "empresa":
     description = models.TextField(blank=True)
     bussiness = models.TextField(blank=True)
@@ -50,13 +46,13 @@ class VendorContact(models.Model):
     phone = models.CharField(max_length=40, blank=True)
     email = models.CharField(max_length=60, blank=True)
 
-    SALES = 'sales'
+    SALES = 'salez'
     PURCHASING = 'purchasing'
     INDEFINITE = 'indefinite'
 
     ROLES = [
-        ('', 'none'),
-        (SALES, 'sales'),
+        ("NONE", ''),
+        (SALES, 'saless'),
         (PURCHASING, 'purchasing'),
         (INDEFINITE, 'any'),
     ]
