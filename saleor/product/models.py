@@ -312,6 +312,14 @@ class ProductsQueryset(models.QuerySet):
         )
 
 
+class BaseProduct(models.Model):
+    product_type = models.ForeignKey(
+        ProductType, related_name="base_products", on_delete=models.CASCADE
+    )
+    name = models.CharField(max_length=250)
+    slug = models.SlugField(max_length=255, unique=True, allow_unicode=True)
+
+
 class Product(SeoModel, ModelWithMetadata):
     product_type = models.ForeignKey(
         ProductType, related_name="products", on_delete=models.CASCADE
@@ -350,6 +358,9 @@ class Product(SeoModel, ModelWithMetadata):
     vendor = models.ForeignKey(
         Vendor, related_name="products", null=True, on_delete=models.CASCADE
     )
+
+    base_product = models.ForeignKey(
+        BaseProduct, related_name="products", on_delete=models.CASCADE)
 
     class Meta:
         app_label = "product"
