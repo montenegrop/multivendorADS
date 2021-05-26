@@ -314,6 +314,45 @@ class ProductsQueryset(models.QuerySet):
 # corregir: ver on_delete
 
 
+class ExperienceLocation(models.Model):
+    country = models.CharField(max_length=3, blank=True, default='AR')
+    province = models.CharField(max_length=40, blank=True)
+    city = models.CharField(max_length=40, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+    lat = models.CharField(max_length=20, blank=True)
+    lon = models.CharField(max_length=20, blank=True)
+
+
+class PastExperience(models.Model):
+    location = models.ForeignKey(
+        ExperienceLocation, blank=True, on_delete=models.CASCADE)
+    description_short = models.CharField(max_length=20)
+    description_long = models.CharField(max_length=1000, blank=True)
+    year_performed = models.IntegerField()
+
+# corregir: alt default
+
+
+class PastExperienceGeneralImage(models.Model):
+    image = VersatileImageField(
+        upload_to="vendors",
+        ppoi_field="ppoi",
+        blank=True,
+    )
+    ppoi = PPOIField()
+    alt = models.CharField(max_length=128, blank=True,
+                           default="foto de experiencia pasada")
+
+
+class PastExperienceImage(PastExperienceGeneralImage):
+    past_experience = models.ForeignKey(
+        PastExperience,
+        related_name="past_experience_images",
+        on_delete=models.CASCADE,
+    )
+    position = models.IntegerField()
+
+
 class BaseProduct(models.Model):
     product_type = models.ForeignKey(
         ProductType, related_name="base_products", null=True, on_delete=models.SET_NULL
@@ -370,6 +409,9 @@ class Product(SeoModel, ModelWithMetadata):
     # corregir: ver on_delete
     base_product = models.ForeignKey(
         BaseProduct, related_name="products", null=True, on_delete=models.CASCADE)
+
+    past_experience = models.ForeignKey(
+        PastExperience, related_name="products", null=True, on_delete=models.CASCADE)
 
     class Meta:
         app_label = "product"
