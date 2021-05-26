@@ -484,6 +484,20 @@ class ProductVariant(ChannelContextTypeWithMetadata, CountableDjangoObjectType):
 
 
 @key(fields="id")
+class BaseProduct(CountableDjangoObjectType):
+    class Meta:
+        interfaces = [relay.Node, ObjectWithMetadata]
+        model = models.BaseProduct
+        only_fields = [
+            "id",
+            "product_type",
+            "category",
+            "name",
+            "slug",
+        ]
+
+
+@key(fields="id")
 class Product(ChannelContextTypeWithMetadata, CountableDjangoObjectType):
     url = graphene.String(
         description="The storefront URL for the product.",

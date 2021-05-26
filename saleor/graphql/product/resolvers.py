@@ -25,6 +25,13 @@ def resolve_category_by_slug(slug):
     return models.Category.objects.filter(slug=slug).first()
 
 
+def resolve_base_products(info, **_kwargs):
+    qs = models.BaseProduct.objects.all()
+    return qs.distinct()
+
+# corregir: por que esto de "children"
+
+
 def resolve_categories(info, level=None, **_kwargs):
     qs = models.Category.objects.prefetch_related("children")
     if level is not None:

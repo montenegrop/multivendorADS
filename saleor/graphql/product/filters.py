@@ -12,7 +12,7 @@ from ...attribute.models import (
     AssignedVariantAttribute,
     Attribute,
 )
-from ...product.models import Category, Collection, Product, ProductType, ProductVariant
+from ...product.models import Category, Collection, Product, ProductType, ProductVariant, BaseProduct
 from saleor.vendors.models import Vendor
 from ...search.backends import picker
 from ...warehouse.models import Stock
@@ -390,6 +390,17 @@ class CollectionFilter(django_filters.FilterSet):
         return queryset
 
 
+class BaseProductFilter(django_filters.FilterSet):
+    search = django_filters.CharFilter(
+        method=filter_fields_containing_value("slug", "name", "description")
+    )
+    ids = GlobalIDMultipleChoiceFilter(field_name="id")
+
+    class Meta:
+        model = BaseProduct
+        fields = ["search"]
+
+
 class CategoryFilter(django_filters.FilterSet):
     search = django_filters.CharFilter(
         method=filter_fields_containing_value("slug", "name", "description")
@@ -441,3 +452,8 @@ class CategoryFilterInput(FilterInputObjectType):
 class ProductTypeFilterInput(FilterInputObjectType):
     class Meta:
         filterset_class = ProductTypeFilter
+
+
+class BaseProductFilterInput(FilterInputObjectType):
+    class Meta:
+        filterset_class = BaseProductFilter

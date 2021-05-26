@@ -7,4 +7,5 @@ from .products import (
     ProductImage,
     ProductType,
     ProductVariant,
+    BaseProduct,
 )

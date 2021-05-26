@@ -39,6 +39,7 @@ from .filters import (
     ProductFilterInput,
     ProductTypeFilterInput,
     ProductVariantFilterInput,
+    BaseProductFilterInput,
 )
 from .mutations.attributes import (
     ProductAttributeAssign,
@@ -100,6 +101,7 @@ from .resolvers import (
     resolve_products,
     resolve_report_product_sales,
     resolve_variant_by_id,
+    resolve_base_products,
 )
 from .sorters import (
     CategorySortingInput,
@@ -114,6 +116,7 @@ from .types import (
     Product,
     ProductType,
     ProductVariant,
+    BaseProduct,
 )
 
 
@@ -170,6 +173,13 @@ class ProductQueries(graphene.ObjectType):
             description="Slug of a channel for which the data should be returned."
         ),
         description="Look up a product by ID.",
+    )
+    # corregir: filtro de categoria para base_products, no se si va filter:
+    base_products = FilterInputConnectionField(
+        BaseProduct,
+        filter=BaseProductFilterInput(
+            description="Filtering options for base products."),
+        description="List of the base products.",
     )
     products = ChannelContextFilterConnectionField(
         Product,
@@ -239,6 +249,9 @@ class ProductQueries(graphene.ObjectType):
         ),
         description="List of top selling products.",
     )
+
+    def resolve_base_products(self, info, **kwargs):
+        return resolve_base_products(info, **kwargs)
 
     def resolve_categories(self, info, level=None, **kwargs):
         return resolve_categories(info, level=level, **kwargs)
