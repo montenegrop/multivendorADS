@@ -323,36 +323,6 @@ class ExperienceLocation(models.Model):
     lon = models.CharField(max_length=20, blank=True)
 
 
-class PastExperience(models.Model):
-    location = models.ForeignKey(
-        ExperienceLocation, blank=True, on_delete=models.CASCADE)
-    description_short = models.CharField(max_length=20)
-    description_long = models.CharField(max_length=1000, blank=True)
-    year_performed = models.IntegerField()
-
-# corregir: alt default
-
-
-class PastExperienceGeneralImage(models.Model):
-    image = VersatileImageField(
-        upload_to="vendors",
-        ppoi_field="ppoi",
-        blank=True,
-    )
-    ppoi = PPOIField()
-    alt = models.CharField(max_length=128, blank=True,
-                           default="foto de experiencia pasada")
-
-
-class PastExperienceImage(PastExperienceGeneralImage):
-    past_experience = models.ForeignKey(
-        PastExperience,
-        related_name="past_experience_images",
-        on_delete=models.CASCADE,
-    )
-    position = models.IntegerField()
-
-
 class BaseProduct(models.Model):
     product_type = models.ForeignKey(
         ProductType, related_name="base_products", null=True, on_delete=models.SET_NULL
@@ -410,9 +380,6 @@ class Product(SeoModel, ModelWithMetadata):
     base_product = models.ForeignKey(
         BaseProduct, related_name="products", null=True, on_delete=models.CASCADE)
 
-    past_experience = models.ForeignKey(
-        PastExperience, related_name="products", null=True, on_delete=models.CASCADE)
-
     class Meta:
         app_label = "product"
         ordering = ("slug",)
@@ -453,6 +420,37 @@ class Product(SeoModel, ModelWithMetadata):
     @staticmethod
     def sort_by_attribute_fields() -> list:
         return ["concatenated_values_order", "concatenated_values", "name"]
+
+
+class PastExperience(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    location = models.ForeignKey(
+        ExperienceLocation, blank=True, on_delete=models.CASCADE)
+    description_short = models.CharField(max_length=20)
+    description_long = models.CharField(max_length=1000, blank=True)
+    year_performed = models.IntegerField()
+
+
+class PastExperienceGeneralImage(models.Model):
+    image = VersatileImageField(
+        upload_to="vendors",
+        ppoi_field="ppoi",
+        blank=True,
+    )
+    ppoi = PPOIField()
+    alt = models.CharField(max_length=128, blank=True,
+                           default="foto de experiencia pasada")
+
+# corregir: alt default
+
+
+class PastExperienceImage(PastExperienceGeneralImage):
+    past_experience = models.ForeignKey(
+        PastExperience,
+        related_name="past_experience_images",
+        on_delete=models.CASCADE,
+    )
+    position = models.IntegerField()
 
 
 class ProductTranslation(SeoModelTranslation):
