@@ -15,6 +15,7 @@ from ....product.models import (
     ProductVariant,
     ProductVariantChannelListing,
     VariantImage,
+    PastExperienceImage,
 )
 from ...core.dataloaders import DataLoader
 
@@ -119,6 +120,17 @@ class ProductTypeByIdLoader(DataLoader):
     def batch_load(self, keys):
         product_types = ProductType.objects.in_bulk(keys)
         return [product_types.get(product_type_id) for product_type_id in keys]
+
+
+class ImagesByPastExperienceIdLoader(DataLoader):
+    context_key = "images_by_past_experience"
+
+    def batch_load(self, keys):
+        images = PastExperienceImage.objects.filter(past_experience_id__in=keys)
+        image_map = defaultdict(list)
+        for image in images:
+            image_map[image.past_experience_id].append(image)
+        return [image_map[past_experience_id] for past_experience_id in keys]
 
 
 class ImagesByProductIdLoader(DataLoader):

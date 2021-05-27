@@ -25,6 +25,7 @@ from .products import (
     VariantChannelListingByVariantIdAndChannelSlugLoader,
     VariantChannelListingByVariantIdLoader,
     VariantsChannelListingByProductIdAndChanneSlugLoader,
+    ImagesByPastExperienceIdLoader,
 )
 
 __all__ = [

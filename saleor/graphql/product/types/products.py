@@ -6,6 +6,8 @@ from django.conf import settings
 from graphene import relay
 from graphene_federation import key
 from graphql.error import GraphQLError
+from graphene_django.types import DjangoObjectType
+
 
 from ....attribute import models as attribute_models
 from ....core.permissions import OrderPermissions, ProductPermissions
@@ -82,6 +84,7 @@ from ..dataloaders import (
     VariantChannelListingByVariantIdAndChannelSlugLoader,
     VariantChannelListingByVariantIdLoader,
     VariantsChannelListingByProductIdAndChanneSlugLoader,
+    ImagesByPastExperienceIdLoader,
 )
 from ..enums import VariantAttributeScope
 from ..filters import ProductFilterInput
@@ -485,6 +488,11 @@ class ProductVariant(ChannelContextTypeWithMetadata, CountableDjangoObjectType):
 
 @key(fields="id")
 class BaseProduct(CountableDjangoObjectType):
+
+    images = graphene.List(
+        lambda: PastExperienceImage, description="List of images for the experience."
+    )
+
     class Meta:
         interfaces = [relay.Node, ObjectWithMetadata]
         model = models.BaseProduct
@@ -495,6 +503,10 @@ class BaseProduct(CountableDjangoObjectType):
             "name",
             "slug",
         ]
+
+    @staticmethod
+    def resolve_images(root: models.PastExperienceImage, info, **_kwargs):
+        return ImagesByPastExperienceIdLoader(info.context).load(root.id)
 
 
 @key(fields="id")
@@ -557,6 +569,10 @@ class Product(ChannelContextTypeWithMetadata, CountableDjangoObjectType):
         description="Whether the product is available for purchase."
     )
 
+    past_experiences = graphene.List(
+        lambda: PastExperience, description="List of experiences of the service product."
+    )
+
     class Meta:
         default_resolver = ChannelContextType.resolver_with_context
         description = "Represents an individual item for sale in the storefront."
@@ -593,6 +609,10 @@ class Product(ChannelContextTypeWithMetadata, CountableDjangoObjectType):
             .load(default_variant_id)
             .then(return_default_variant_with_channel_context)
         )
+
+    @staticmethod
+    def resolve_past_experiences(root: ChannelContext[models.Product], info):
+        return models.PastExperience.objects.filter(product_id=root.node.pk)
 
     @staticmethod
     def resolve_category(root: ChannelContext[models.Product], info):
@@ -1132,3 +1152,44 @@ class ProductImage(CountableDjangoObjectType):
     @staticmethod
     def __resolve_reference(root, _info, **_kwargs):
         return graphene.Node.get_node_from_global_id(_info, root.id)
+
+
+@key(fields="id")
+class PastExperienceImage(CountableDjangoObjectType):
+    url = graphene.String(
+        required=True,
+        description="The URL of the image.",
+        size=graphene.Int(description="Size of the image."),
+    )
+
+    class Meta:
+        description = "Represents a past experience image."
+        only_fields = ["alt", "id", "sort_order"]
+        interfaces = [relay.Node]
+        model = models.PastExperienceImage
+
+    @staticmethod
+    def resolve_url(root: models.PastExperienceImage, info, *, size=None):
+        if size:
+            url = get_thumbnail(root.image, size, method="thumbnail")
+        else:
+            url = root.image.url
+        return info.context.build_absolute_uri(url)
+
+    @staticmethod
+    def __resolve_reference(root, _info, **_kwargs):
+        return graphene.Node.get_node_from_global_id(_info, root.id)
+
+
+@key(fields="id")
+class PastExperience(DjangoObjectType):
+
+    class Meta:
+        model = models.PastExperience
+        only_fields = [
+            "id",
+            "year_performed",
+            "description_short",
+            "description_long",
+            "past_experience_images",
+        ]
