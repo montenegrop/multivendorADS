@@ -38,6 +38,9 @@ class Vendor(ModelWithMetadata):
     # fields de ubicacion:
     location = models.ForeignKey(VendorLocation, on_delete=models.CASCADE, null=True)
 
+    # si tiene servicios:
+    services = models.ManyToManyField('product.BaseProduct', blank=True)
+
 
 class VendorContact(models.Model):
     Vendor = models.ForeignKey(

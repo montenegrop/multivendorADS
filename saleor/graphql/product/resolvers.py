@@ -25,7 +25,9 @@ def resolve_category_by_slug(slug):
     return models.Category.objects.filter(slug=slug).first()
 
 
-def resolve_base_products(info, **_kwargs):
+def resolve_base_products(info, vendor_id, **_kwargs):
+    if vendor_id:
+        pass
     qs = models.BaseProduct.objects.all()
     return qs.distinct()
 

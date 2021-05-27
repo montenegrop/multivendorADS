@@ -13,6 +13,7 @@ from ....attribute import models as attribute_models
 from ....core.permissions import OrderPermissions, ProductPermissions
 from ....core.weight import convert_weight_to_default_weight_unit
 from ....product import models
+from saleor.vendors.models import Vendor
 from ....product.templatetags.product_images import (
     get_product_image_thumbnail,
     get_thumbnail,
@@ -1162,9 +1163,9 @@ class PastExperienceImage(CountableDjangoObjectType):
         size=graphene.Int(description="Size of the image."),
     )
 
+    # corregir: ver si agregar otro campo en Meta
     class Meta:
         description = "Represents a past experience image."
-        only_fields = ["alt", "id", "sort_order"]
         interfaces = [relay.Node]
         model = models.PastExperienceImage
 

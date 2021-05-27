@@ -177,6 +177,7 @@ class ProductQueries(graphene.ObjectType):
     # corregir: filtro de categoria para base_products, no se si va filter:
     base_products = FilterInputConnectionField(
         BaseProduct,
+        vendor_id=graphene.String(description="to get base product of a vendor"),
         filter=BaseProductFilterInput(
             description="Filtering options for base products."),
         description="List of the base products.",
@@ -250,8 +251,8 @@ class ProductQueries(graphene.ObjectType):
         description="List of top selling products.",
     )
 
-    def resolve_base_products(self, info, **kwargs):
-        return resolve_base_products(info, **kwargs)
+    def resolve_base_products(self, info, vendor_id=None, **kwargs):
+        return resolve_base_products(info, vendor_id, **kwargs)
 
     def resolve_categories(self, info, level=None, **kwargs):
         return resolve_categories(info, level=level, **kwargs)

@@ -430,6 +430,7 @@ class PastExperience(models.Model):
     description_short = models.CharField(max_length=20)
     description_long = models.CharField(max_length=1000, blank=True)
     year_performed = models.IntegerField()
+    in_construirte = models.BooleanField(default=False)
 
 
 class PastExperienceGeneralImage(models.Model):
