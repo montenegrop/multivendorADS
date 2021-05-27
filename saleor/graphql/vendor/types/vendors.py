@@ -153,6 +153,7 @@ class Vendor(CountableDjangoObjectType):
             "email",
             "location",
             "contacts",
+            "services",
         ]
 
     # corregir: (formato imagen banner, ver get_adjusted)
