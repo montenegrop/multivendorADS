@@ -667,6 +667,33 @@ enum AuthorizationKeyType {
   GOOGLE_OAUTH2
 }
 
+type BaseProduct implements Node & ObjectWithMetadata {
+  id: ID!
+  productType: ProductType
+  category: Category
+  name: String!
+  slug: String!
+  privateMetadata: [MetadataItem]!
+  metadata: [MetadataItem]!
+  images: [PastExperienceImage]
+}
+
+type BaseProductCountableConnection {
+  pageInfo: PageInfo!
+  edges: [BaseProductCountableEdge!]!
+  totalCount: Int
+}
+
+type BaseProductCountableEdge {
+  node: BaseProduct!
+  cursor: String!
+}
+
+input BaseProductFilterInput {
+  search: String
+  ids: [ID]
+}
+
 input BulkAttributeValueInput {
   id: ID
   values: [String]!
@@ -1883,6 +1910,13 @@ type Error {
   message: String
 }
 
+type ExperienceLocation {
+  id: ID!
+  country: String!
+  province: String!
+  city: String!
+}
+
 type ExportError {
   field: String
   message: String
@@ -2576,6 +2610,7 @@ type Mutation {
   vendorCreateOrUpdate(id: ID, input: VendorCreateOrUpdateInput!): VendorCreateOrUpdate
   vendorLocationCreateOrUpdate(id: ID, input: VendorLocationCreateOrUpdateInput!): VendorLocationCreateOrUpdate
   vendorImageCreateOrUpdate(input: VendorImageCreateInput): VendorImageCreate
+  vendorServicesUpdate(services: [ID]!): VendorServicesUpdate
   webhookCreate(input: WebhookCreateInput!): WebhookCreate
   webhookDelete(id: ID!): WebhookDelete
   webhookUpdate(id: ID!, input: WebhookUpdateInput!): WebhookUpdate
@@ -2661,6 +2696,7 @@ type Mutation {
   productVariantChannelListingUpdate(id: ID!, input: [ProductVariantChannelListingAddInput!]!): ProductVariantChannelListingUpdate
   variantImageAssign(imageId: ID!, variantId: ID!): VariantImageAssign
   variantImageUnassign(imageId: ID!, variantId: ID!): VariantImageUnassign
+  pastExperienceCreate(input: PastExperienceCreateInput!): PastExperienceCreate
   paymentCapture(amount: PositiveDecimal, paymentId: ID!): PaymentCapture
   paymentRefund(amount: PositiveDecimal, paymentId: ID!): PaymentRefund
   paymentVoid(paymentId: ID!): PaymentVoid
@@ -3510,6 +3546,52 @@ type PasswordChange {
   accountErrors: [AccountError!]!
 }
 
+type PastExperience {
+  id: ID!
+  location: ExperienceLocation
+  descriptionShort: String!
+  descriptionLong: String!
+  yearPerformed: Int!
+  pastExperienceImages(before: String, after: String, first: Int, last: Int): PastExperienceImageCountableConnection!
+}
+
+type PastExperienceCreate {
+  errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
+  experience: String
+  productErrors: [ProductError!]!
+}
+
+input PastExperienceCreateInput {
+  serviceId: ID
+  country: String
+  province: String
+  city: String
+  descriptionShort: String
+  descriptionLong: String
+  yearPermormed: String
+}
+
+type PastExperienceImage implements Node {
+  id: ID!
+  image: String!
+  ppoi: String!
+  alt: String!
+  pastExperience: PastExperience!
+  position: Int!
+  url(size: Int): String!
+}
+
+type PastExperienceImageCountableConnection {
+  pageInfo: PageInfo!
+  edges: [PastExperienceImageCountableEdge!]!
+  totalCount: Int
+}
+
+type PastExperienceImageCountableEdge {
+  node: PastExperienceImage!
+  cursor: String!
+}
+
 type Payment implements Node {
   id: ID!
   gateway: String!
@@ -3810,6 +3892,7 @@ type Product implements Node & ObjectWithMetadata {
   translation(languageCode: LanguageCodeEnum!): ProductTranslation
   availableForPurchase: Date
   isAvailableForPurchase: Boolean
+  pastExperiences: [PastExperience]
 }
 
 type ProductAttributeAssign {
@@ -4414,6 +4497,7 @@ type Query {
   collection(id: ID, slug: String, channel: String): Collection
   collections(filter: CollectionFilterInput, sortBy: CollectionSortingInput, channel: String, before: String, after: String, first: Int, last: Int): CollectionCountableConnection
   product(id: ID, slug: String, channel: String): Product
+  baseProducts(vendorId: String, filter: BaseProductFilterInput, before: String, after: String, first: Int, last: Int): BaseProductCountableConnection
   products(filter: ProductFilterInput, sortBy: ProductOrder, stockAvailability: StockAvailability, channel: String, vendor: Boolean = false, before: String, after: String, first: Int, last: Int): ProductCountableConnection
   productType(id: ID!): ProductType
   productTypes(filter: ProductTypeFilterInput, sortBy: ProductTypeSortingInput, before: String, after: String, first: Int, last: Int): ProductTypeCountableConnection
@@ -5457,9 +5541,11 @@ type Vendor implements Node & ObjectWithMetadata {
   phone: String!
   address: String!
   location: VendorLocation
+  services(before: String, after: String, first: Int, last: Int): BaseProductCountableConnection!
   contacts: [VendorContact!]!
   privateMetadata: [MetadataItem]!
   metadata: [MetadataItem]!
+  pastExperiences: [PastExperience]
   mainImage: VendorMainImage
   serviceImages: [VendorServiceImage]
   mainCategories: [Category]
@@ -5555,7 +5641,7 @@ type VendorLocationCreateOrUpdate {
 }
 
 input VendorLocationCreateOrUpdateInput {
-  provice: String
+  province: String
   city: String
   postalCode: String
   lat: String
@@ -5575,6 +5661,12 @@ type VendorServiceImage implements Node {
   title: String!
   position: Int!
   url(size: Int): String
+}
+
+type VendorServicesUpdate {
+  errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
+  services: [String]
+  vendorErrors: [VendorError!]!
 }
 
 enum VendorSortField {
@@ -5992,7 +6084,7 @@ enum WeightUnitsEnum {
 
 scalar _Any
 
-union _Entity = ProductVariant | Product | ProductType | Collection | Category | ProductImage | VendorLocation | VendorContact | VendorServiceImage | VendorMainImage | Vendor | Address | User | Group | App | PageType
+union _Entity = ProductVariant | BaseProduct | Product | ProductType | Collection | Category | ProductImage | PastExperienceImage | ExperienceLocation | PastExperience | VendorLocation | VendorContact | VendorServiceImage | VendorMainImage | Vendor | Address | User | Group | App | PageType
 
 type _Service {
   sdl: String
