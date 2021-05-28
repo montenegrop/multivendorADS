@@ -12,7 +12,7 @@ from saleor.graphql.core.types import (
 
 from saleor.graphql.meta.types import ObjectWithMetadata
 
-from saleor.graphql.product.types import Category
+from saleor.graphql.product.types import Category, PastExperience
 
 from saleor.graphql.vendor.dataloaders.vendors import (
     ServiceImagesByVendorIdLoader,
@@ -21,6 +21,7 @@ from saleor.graphql.vendor.dataloaders.vendors import (
 from saleor.vendors import models
 
 from saleor.product.models import Category as CategoryModel
+from saleor.product.models import PastExperience as PastExperienceModel
 
 
 # from saleor.product.templatetags.product_images import get_thumbnail
@@ -121,6 +122,9 @@ class VendorMainImage(DjangoObjectType):
 @key(fields="id")
 class Vendor(CountableDjangoObjectType):
 
+    past_experiences = graphene.List(
+        PastExperience, description="Past experiences when vendor gives services.")
+
     main_image = graphene.Field(VendorMainImage, description="Vendor main image.")
 
     service_images = graphene.List(
@@ -183,6 +187,10 @@ class Vendor(CountableDjangoObjectType):
         return CategoryModel.objects.filter(
             children__in=categories).distinct().order_by(
             'relevance')
+
+    @staticmethod
+    def resolve_past_experiences(root: models.Vendor, info, **_kwargs):
+        return PastExperienceModel.objects.filter(product__vendor_id=root.id)
 
 # Input para mutaciones:
 

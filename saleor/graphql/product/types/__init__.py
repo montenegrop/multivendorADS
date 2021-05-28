@@ -8,4 +8,5 @@ from .products import (
     ProductType,
     ProductVariant,
     BaseProduct,
+    PastExperience,
 )

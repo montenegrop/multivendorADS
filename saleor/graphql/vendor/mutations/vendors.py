@@ -93,8 +93,6 @@ class VendorServicesUpdate(BaseMutation):
         services = []
         [services.append(service.name) for service in vendor.services.all()]
 
-        # .exclude(id__in=[...]))
-
         return VendorServicesUpdate(services=services)
 
 

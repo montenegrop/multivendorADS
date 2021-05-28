@@ -1183,7 +1183,22 @@ class PastExperienceImage(CountableDjangoObjectType):
 
 
 @key(fields="id")
+class ExperienceLocation(DjangoObjectType):
+
+    class Meta:
+        model = models.ExperienceLocation
+        only_fields = [
+            "id",
+            "country",
+            "province",
+            "city",
+        ]
+
+
+@key(fields="id")
 class PastExperience(DjangoObjectType):
+
+    location = graphene.Field(ExperienceLocation)
 
     class Meta:
         model = models.PastExperience
@@ -1193,4 +1208,5 @@ class PastExperience(DjangoObjectType):
             "description_short",
             "description_long",
             "past_experience_images",
+            "location",
         ]

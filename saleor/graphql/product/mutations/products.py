@@ -509,6 +509,39 @@ class ProductCreateInput(ProductInput):
 T_INPUT_MAP = List[Tuple[attribute_models.Attribute, AttrValuesInput]]
 
 
+class PastExperienceCreateInput(graphene.InputObjectType):
+    service_id = graphene.ID(description=" global ID of the product service.")
+    country = graphene.String(description="Experience location country.")
+    province = graphene.String(description="Experience location province.")
+    city = graphene.String(description="Experience location city.")
+    description_short = graphene.String(description="Experience description, 20 words.")
+    description_long = graphene.String(
+        description="Experience description, 1000 words.")
+    year_permormed = graphene.String(description="Year when job was done.")
+
+
+class PastExperienceCreate(BaseMutation):
+
+    experience = graphene.String()
+
+    class Arguments:
+        input = PastExperienceCreateInput(
+            required=True, description="Fields required to create a past experience")
+
+    # corregir: ver permisos
+    class Meta:
+        description = "Creates a new experience for service vendor."
+        permissions = (ProductPermissions.MANAGE_PRODUCTS,)
+        error_type_class = ProductError
+        error_type_field = "product_errors"
+
+    @classmethod
+    def perform_mutation(cls, _root, info, **data):
+        data = data.get("input")
+
+        return PastExperienceCreate(experience="experiencia hecha")
+
+
 class ProductCreate(ModelMutation):
     class Arguments:
         input = ProductCreateInput(
