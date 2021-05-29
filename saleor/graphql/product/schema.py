@@ -87,6 +87,7 @@ from .mutations.products import (
     VariantImageUnassign,
     PastExperienceCreate,
     BaseProductCreate,
+    PastExperienceImageCreate,
 )
 from .resolvers import (
     resolve_categories,
@@ -451,3 +452,4 @@ class ProductMutations(graphene.ObjectType):
 
     past_experience_create = PastExperienceCreate.Field()
     base_product_create = BaseProductCreate.Field()
+    past_experience_image_create = PastExperienceImageCreate.Field()

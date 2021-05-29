@@ -9,4 +9,5 @@ from .products import (
     ProductVariant,
     BaseProduct,
     PastExperience,
+    PastExperienceImage,
 )

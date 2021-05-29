@@ -49,6 +49,8 @@ from ..types import (
     ProductImage,
     ProductType,
     ProductVariant,
+    PastExperience,
+    PastExperienceImage,
 )
 from ..utils import (
     create_stocks,
@@ -1642,3 +1644,51 @@ class BaseProductCreate(ModelMutation):
         permissions = ("is_superuser", )
         error_type_class = ProductError
         error_type_field = "product_errors"
+
+
+class PastExperienceImageCreateInput(graphene.InputObjectType):
+    alt = graphene.String(description="Alt text for an image.")
+    position = graphene.Scalar(
+        required=True, desceiption="Values from 0 to 4. 0 is main past experience image.")
+    image = Upload(
+        required=True, description="Represents an image file in a multipart request."
+    )
+    past_experience = graphene.ID(
+        required=True, description="ID of a past experience.", name="past experience"
+    )
+
+
+class PastExperienceImageCreate(BaseMutation):
+    past_experience = graphene.Field(PastExperience)
+    image = graphene.Field(PastExperienceImage)
+    position = graphene.String()
+
+    class Arguments:
+        input = PastExperienceImageCreateInput(
+            required=True, description="Fields required to create a past experience image."
+        )
+
+    # corregir: ver permisos
+    class Meta:
+        description = (
+            "Create a past experience image. This mutation must be sent as a `multipart` "
+            "request. More detailed specs of the upload format can be found here: "
+            "https://github.com/jaydenseric/graphql-multipart-request-spec"
+        )
+        error_type_class = ProductError
+        error_type_field = "product_errors"
+
+    @classmethod
+    def perform_mutation(cls, _root, info, **data):
+        data = data.get("input")
+        past_experience = cls.get_node_or_error(
+            info, data["past_experience"], field="past_experience", only_type=PastExperience
+        )
+
+        image_data = info.context.FILES.get(data["image"])
+        validate_image_file(image_data, "image")
+
+        image = past_experience.past_experience_images.create(
+            image=image_data, alt=data.get("alt", ""), position=int(data["position"]))
+        # past_experience = ChannelContext(node=product, channel_slug=None)
+        return ProductImageCreate(past_experience=past_experience, image=image, position=data["image"])
