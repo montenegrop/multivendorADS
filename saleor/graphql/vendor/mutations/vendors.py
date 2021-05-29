@@ -83,9 +83,8 @@ class VendorServicesUpdate(BaseMutation):
                                 1]) for service_global_id in services_global_ids]
 
         # borrar servicios que no provee más:
-        if ids_of_services:
-            services_to_be_removed = vendor.services.exclude(id__in=ids_of_services)
-            vendor.services.remove(*services_to_be_removed)
+        services_to_be_removed = vendor.services.exclude(id__in=ids_of_services)
+        vendor.services.remove(*services_to_be_removed)
 
         # agregar servicios nuevos:
         vendor.services.add(*ids_of_services)
