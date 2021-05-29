@@ -1615,3 +1615,30 @@ class VariantImageUnassign(BaseMutation):
 
         variant = ChannelContext(node=variant, channel_slug=None)
         return VariantImageUnassign(product_variant=variant, image=image)
+
+
+class BaseProductCreateInput(graphene.InputObjectType):
+    product_type = graphene.ID(
+        description="ID of the type the base product belongs to.",
+        name="productType",
+        required=True,
+    )
+    category = graphene.ID(
+        description="ID of the base product's category.", name="category")
+    name = graphene.String(description="Base product name.")
+    slug = graphene.String(description="Base product slug.")
+
+
+class BaseProductCreate(ModelMutation):
+    class Arguments:
+        input = BaseProductCreateInput(
+            required=True,
+            description="Fields required to create a base product."
+        )
+
+    class Meta:
+        description = "Creates a new base product."
+        model = models.BaseProduct
+        permissions = ("is_superuser", )
+        error_type_class = ProductError
+        error_type_field = "product_errors"
