@@ -523,7 +523,7 @@ class PastExperienceCreateInput(graphene.InputObjectType):
         description="Experience description, 20 words.", required=False)
     description_long = graphene.String(
         description="Experience description, 1000 words.", required=False)
-    year_permormed = graphene.Int(
+    year_performed = graphene.Int(
         description="Year when job was done.", required=False)
 
 

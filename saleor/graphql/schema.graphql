@@ -689,6 +689,19 @@ type BaseProductCountableEdge {
   cursor: String!
 }
 
+type BaseProductCreate {
+  errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
+  productErrors: [ProductError!]!
+  baseProduct: BaseProduct
+}
+
+input BaseProductCreateInput {
+  productType: ID!
+  category: ID
+  name: String
+  slug: String
+}
+
 input BaseProductFilterInput {
   search: String
   ids: [ID]
@@ -2696,7 +2709,9 @@ type Mutation {
   productVariantChannelListingUpdate(id: ID!, input: [ProductVariantChannelListingAddInput!]!): ProductVariantChannelListingUpdate
   variantImageAssign(imageId: ID!, variantId: ID!): VariantImageAssign
   variantImageUnassign(imageId: ID!, variantId: ID!): VariantImageUnassign
-  pastExperienceCreate(input: PastExperienceCreateInput!): PastExperienceCreate
+  pastExperienceCreate(id: ID, input: PastExperienceCreateInput!): PastExperienceCreate
+  baseProductCreate(input: BaseProductCreateInput!): BaseProductCreate
+  pastExperienceImageCreate(input: PastExperienceImageCreateInput!): PastExperienceImageCreate
   paymentCapture(amount: PositiveDecimal, paymentId: ID!): PaymentCapture
   paymentRefund(amount: PositiveDecimal, paymentId: ID!): PaymentRefund
   paymentVoid(paymentId: ID!): PaymentVoid
@@ -3546,19 +3561,19 @@ type PasswordChange {
   accountErrors: [AccountError!]!
 }
 
-type PastExperience {
+type PastExperience implements Node {
   id: ID!
   location: ExperienceLocation
   descriptionShort: String!
   descriptionLong: String!
-  yearPerformed: Int!
+  yearPerformed: Int
   pastExperienceImages(before: String, after: String, first: Int, last: Int): PastExperienceImageCountableConnection!
 }
 
 type PastExperienceCreate {
   errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
-  experience: String
   productErrors: [ProductError!]!
+  pastExperience: PastExperience
 }
 
 input PastExperienceCreateInput {
@@ -3568,7 +3583,7 @@ input PastExperienceCreateInput {
   city: String
   descriptionShort: String
   descriptionLong: String
-  yearPermormed: String
+  yearPerformed: Int
 }
 
 type PastExperienceImage implements Node {
@@ -3590,6 +3605,21 @@ type PastExperienceImageCountableConnection {
 type PastExperienceImageCountableEdge {
   node: PastExperienceImage!
   cursor: String!
+}
+
+type PastExperienceImageCreate {
+  errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
+  pastExperience: PastExperience
+  image: PastExperienceImage
+  position: String
+  productErrors: [ProductError!]!
+}
+
+input PastExperienceImageCreateInput {
+  alt: String
+  position: String!
+  image: Upload!
+  pastExperience: ID!
 }
 
 type Payment implements Node {
