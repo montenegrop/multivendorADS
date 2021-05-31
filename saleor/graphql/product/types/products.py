@@ -1196,12 +1196,14 @@ class ExperienceLocation(DjangoObjectType):
 
 
 @key(fields="id")
-class PastExperience(DjangoObjectType):
+class PastExperience(CountableDjangoObjectType):
 
     location = graphene.Field(ExperienceLocation)
 
+    # corregir: objectwithmetadata
     class Meta:
         model = models.PastExperience
+        interfaces = [relay.Node]
         only_fields = [
             "id",
             "year_performed",

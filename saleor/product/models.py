@@ -424,12 +424,12 @@ class Product(SeoModel, ModelWithMetadata):
 
 class PastExperience(models.Model):
     product = models.ForeignKey(
-        Product, on_delete=models.SET_NULL, null=True, related_name="past_experiences")
+        Product, on_delete=models.SET_NULL, null=True, related_name="past_experiences", blank=True)
     location = models.ForeignKey(
-        ExperienceLocation, null=True, on_delete=models.CASCADE)
-    description_short = models.CharField(max_length=20)
+        ExperienceLocation, null=True, on_delete=models.CASCADE, blank=True)
+    description_short = models.CharField(max_length=20, blank=True)
     description_long = models.CharField(max_length=1000, blank=True)
-    year_performed = models.IntegerField()
+    year_performed = models.IntegerField(blank=True, null=True)
     in_construirte = models.BooleanField(default=False)
 
 

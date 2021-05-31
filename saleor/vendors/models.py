@@ -30,13 +30,14 @@ class Vendor(ModelWithMetadata):
     billing = models.CharField(max_length=70, blank=True)
 
     # fields for "contacto":
-    email = models.EmailField(unique=True, null=True)
+    email = models.EmailField(unique=True, null=True, blank=True)
     website_url = models.CharField(max_length=90, blank=True)
     phone = models.CharField(max_length=40, blank=True)
     address = models.CharField(max_length=40, blank=True)
 
     # fields de ubicacion:
-    location = models.ForeignKey(VendorLocation, on_delete=models.CASCADE, null=True)
+    location = models.ForeignKey(
+        VendorLocation, on_delete=models.CASCADE, null=True, blank=True)
 
     # si tiene servicios:
     services = models.ManyToManyField('product.BaseProduct', blank=True)

@@ -512,36 +512,74 @@ T_INPUT_MAP = List[Tuple[attribute_models.Attribute, AttrValuesInput]]
 
 
 class PastExperienceCreateInput(graphene.InputObjectType):
-    service_id = graphene.ID(description=" global ID of the product service.")
-    country = graphene.String(description="Experience location country.")
-    province = graphene.String(description="Experience location province.")
-    city = graphene.String(description="Experience location city.")
-    description_short = graphene.String(description="Experience description, 20 words.")
+    service_id = graphene.ID(
+        description=" global ID of the product service.", required=False)
+    country = graphene.String(
+        description="Experience location country.", required=False)
+    province = graphene.String(
+        description="Experience location province.", required=False)
+    city = graphene.String(description="Experience location city.", required=False)
+    description_short = graphene.String(
+        description="Experience description, 20 words.", required=False)
     description_long = graphene.String(
-        description="Experience description, 1000 words.")
-    year_permormed = graphene.String(description="Year when job was done.")
+        description="Experience description, 1000 words.", required=False)
+    year_permormed = graphene.Int(
+        description="Year when job was done.", required=False)
 
 
-class PastExperienceCreate(BaseMutation):
-
-    experience = graphene.String()
-
+class PastExperienceCreate(ModelMutation):
     class Arguments:
+        id = graphene.Argument(
+            graphene.ID, description="ID of the experience to modify.", required=False
+        )
         input = PastExperienceCreateInput(
             required=True, description="Fields required to create a past experience")
 
     # corregir: ver permisos
     class Meta:
         description = "Creates a new experience for service vendor."
-        permissions = (ProductPermissions.MANAGE_PRODUCTS,)
+        permissions = ("is_superuser")
+        model = models.PastExperience
         error_type_class = ProductError
         error_type_field = "product_errors"
 
     @classmethod
-    def perform_mutation(cls, _root, info, **data):
-        data = data.get("input")
+    def mutate(cls, root, info, **data):
+        response = super().mutate(root, info, **data)
+        return response
 
-        return PastExperienceCreate(experience="experiencia hecha")
+    @classmethod
+    def clean_input(cls, info, instance, data):
+        return super().clean_input(info, instance, data)
+
+    @classmethod
+    @transaction.atomic
+    def save(cls, info, instance, cleaned_input):
+        instance.save()
+
+    # @ classmethod
+    # def mutate(cls, root, info, **data):
+    #     vendor = info.context.user.vendor
+    #     if 'id' not in data.keys() and vendor.location:
+    #         vendor_location_global_id = to_global_id(
+    #             VendorLocation._meta.name, vendor.location.pk)
+    #         data['id'] = vendor_location_global_id
+
+    #     response = super().mutate(root, info, **data)
+    #     return response
+
+    # @classmethod
+    # def perform_mutation(cls, _root, info, **data):
+    #     data = data.get("input")
+
+    #     if not data.get("id"):
+    #         created_empty_past_experience = models.PastExperience()
+    #         created_empty_past_experience.save()
+    #         x = created_empty_past_experience
+
+    #     y = cls.get_node_by_pk(info, PastExperience, 13)
+
+    #     return PastExperienceCreate(experience=y)
 
 
 class ProductCreate(ModelMutation):
