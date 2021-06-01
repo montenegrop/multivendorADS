@@ -139,7 +139,7 @@ class VendorLocationCreateOrUpdate(ModelMutation):
 
 class VendorImageCreate(BaseMutation):
     vendor = graphene.Field(Vendor)
-    images_url = graphene.String(description="images url")
+    image_url = graphene.String(description="images' url")
 
     class Arguments:
         input = VendorImageCreateInput(
@@ -170,15 +170,18 @@ class VendorImageCreate(BaseMutation):
             if not image:
                 image = vendor.service_images.create(position=int(data['position']))
             image.image = image_data
-            image.alt = data.get("alt", "")
             image.title = data.get("title", "")
 
         else:
             image = vendor.main_image.last()
             if not image:
                 image = vendor.main_image.create(image=image_data)
-            image.alt = data.get("alt", "")
+            else:
+                image.image = image_data
 
-        image_url = image.url
+        image.alt = data.get("alt", "")
+        image.save()
+
+        image_url = image.image.url
 
         return VendorImageCreate(vendor=vendor, image_url=image_url)
