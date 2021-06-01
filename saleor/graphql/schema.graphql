@@ -5641,7 +5641,7 @@ enum VendorErrorCode {
 type VendorImageCreate {
   errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
   vendor: Vendor
-  imagesUrl: String
+  imageUrl: String
   vendorErrors: [VendorError!]!
 }
 
