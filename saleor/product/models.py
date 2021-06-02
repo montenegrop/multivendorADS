@@ -435,7 +435,7 @@ class PastExperience(models.Model):
 
 class PastExperienceGeneralImage(models.Model):
     image = VersatileImageField(
-        upload_to="vendors",
+        upload_to="experiences",
         ppoi_field="ppoi",
         blank=True,
     )

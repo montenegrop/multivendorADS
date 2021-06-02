@@ -190,7 +190,7 @@ class Vendor(CountableDjangoObjectType):
 
     @staticmethod
     def resolve_past_experiences(root: models.Vendor, info, **_kwargs):
-        return PastExperienceModel.objects.filter(product__vendor_id=root.id)
+        return PastExperienceModel.objects.all()
 
 # Input para mutaciones:
 
