@@ -35,6 +35,13 @@ class AccountRegisterInput(graphene.InputObjectType):
         ),
         required=False,
     )
+    type_of_identification = graphene.String(description="Type of ID.", required=False)
+    identification = graphene.String(description="Id", required=False)
+    phone = graphene.String(description="Phone.", required=False)
+    first_name = graphene.String(description="First name.", required=False)
+    last_name = graphene.String(description="Lasrt name.", required=False)
+    provides_services = graphene.Boolean(
+        description="User is service-provides.", default=False)
 
 
 class AccountRegister(ModelMutation):

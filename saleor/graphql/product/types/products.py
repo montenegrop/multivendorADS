@@ -1198,7 +1198,7 @@ class ExperienceLocation(DjangoObjectType):
 @key(fields="id")
 class PastExperience(CountableDjangoObjectType):
 
-    location = graphene.Field(ExperienceLocation)
+    service = graphene.Field(BaseProduct)
 
     # corregir: objectwithmetadata
     class Meta:
@@ -1211,4 +1211,9 @@ class PastExperience(CountableDjangoObjectType):
             "description_long",
             "past_experience_images",
             "location",
+            "product",
         ]
+
+    @staticmethod
+    def resolve_service(root: models.PastExperience, info):
+        return root.product.base_product
