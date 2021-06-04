@@ -92,6 +92,12 @@ input AccountRegisterInput {
   email: String!
   password: String!
   redirectUrl: String
+  typeOfIdentification: String
+  identification: String
+  phone: String
+  firstName: String
+  lastName: String
+  providesServices: Boolean
 }
 
 type AccountRequestDeletion {
@@ -3563,11 +3569,13 @@ type PasswordChange {
 
 type PastExperience implements Node {
   id: ID!
+  product: Product
   location: ExperienceLocation
   descriptionShort: String!
   descriptionLong: String!
   yearPerformed: Int
   pastExperienceImages(before: String, after: String, first: Int, last: Int): PastExperienceImageCountableConnection!
+  service: BaseProduct
 }
 
 type PastExperienceCreate {
