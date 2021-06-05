@@ -72,8 +72,6 @@ class AccountRegister(ModelMutation):
 
         # corregir:
         # # adding vendor to user CAMBIAR:
-        vendorr = Vendor.objects.get(id=3)
-        instance.vendor = vendorr
 
         if not settings.ENABLE_ACCOUNT_CONFIRMATION_BY_EMAIL:
             return super().clean_input(info, instance, data, input_cls=None)
