@@ -23,7 +23,7 @@ from .base import (
     BaseCustomerCreate,
 )
 
-from saleor.vendors.models import Vendor
+from saleor.vendors.models import Vendor, VendorLocation
 
 
 class AccountRegisterInput(graphene.InputObjectType):
@@ -107,11 +107,18 @@ class AccountRegister(ModelMutation):
     def save(cls, info, user, cleaned_input):
         password = cleaned_input["password"]
         if cleaned_input["provides_services"]:
-            vendor = models.Vendor.objects.create(
-                name=user.email, slug=user.email + '_slug')
+            # vendor location:
+            vendor_location = VendorLocation.objects.create(
+                city="Rosario", province="Santa Fe")
+            # vendor:
+            vendor = Vendor.objects.create(
+                name=user.email, slug=user.email + '_slug', location=vendor_location)
             user.vendor = vendor
+            # user permissions:
+
             user.is_superuser = True
             user.is_staff = True
+
         user.set_password(password)
         if settings.ENABLE_ACCOUNT_CONFIRMATION_BY_EMAIL:
             user.is_active = False
