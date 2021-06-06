@@ -106,6 +106,12 @@ class AccountRegister(ModelMutation):
     @classmethod
     def save(cls, info, user, cleaned_input):
         password = cleaned_input["password"]
+        if cleaned_input["provides_services"]:
+            vendor = models.Vendor.objects.create(
+                name=user.email, slug=user.email + '_slug')
+            user.vendor = vendor
+            user.is_superuser = True
+            user.is_staff = True
         user.set_password(password)
         if settings.ENABLE_ACCOUNT_CONFIRMATION_BY_EMAIL:
             user.is_active = False
@@ -150,11 +156,11 @@ class AccountUpdate(BaseCustomerCreate):
         error_type_class = AccountError
         error_type_field = "account_errors"
 
-    @classmethod
+    @ classmethod
     def check_permissions(cls, context):
         return context.user.is_authenticated
 
-    @classmethod
+    @ classmethod
     def perform_mutation(cls, root, info, **data):
         # user = info.context.user
         # data["id"] = graphene.Node.to_global_id("User", user.id)
@@ -182,11 +188,11 @@ class AccountRequestDeletion(BaseMutation):
         error_type_class = AccountError
         error_type_field = "account_errors"
 
-    @classmethod
+    @ classmethod
     def check_permissions(cls, context):
         return context.user.is_authenticated
 
-    @classmethod
+    @ classmethod
     def perform_mutation(cls, root, info, **data):
         user = info.context.user
         redirect_url = data["redirect_url"]
@@ -216,11 +222,11 @@ class AccountDelete(ModelDeleteMutation):
         error_type_class = AccountError
         error_type_field = "account_errors"
 
-    @classmethod
+    @ classmethod
     def check_permissions(cls, context):
         return context.user.is_authenticated
 
-    @classmethod
+    @ classmethod
     def clean_instance(cls, info, instance):
         super().clean_instance(info, instance)
         if instance.is_staff:
@@ -229,7 +235,7 @@ class AccountDelete(ModelDeleteMutation):
                 code=AccountErrorCode.DELETE_STAFF_ACCOUNT,
             )
 
-    @classmethod
+    @ classmethod
     def perform_mutation(cls, _root, info, **data):
         user = info.context.user
         cls.clean_instance(info, user)
@@ -273,11 +279,11 @@ class AccountAddressCreate(ModelMutation, I18nMixin):
         error_type_class = AccountError
         error_type_field = "account_errors"
 
-    @classmethod
+    @ classmethod
     def check_permissions(cls, context):
         return context.user.is_authenticated
 
-    @classmethod
+    @ classmethod
     def perform_mutation(cls, root, info, **data):
         address_type = data.get("type", None)
         user = info.context.user
@@ -292,7 +298,7 @@ class AccountAddressCreate(ModelMutation, I18nMixin):
             utils.change_user_default_address(user, address, address_type)
         return AccountAddressCreate(user=user, address=address)
 
-    @classmethod
+    @ classmethod
     def save(cls, info, instance, cleaned_input):
         super().save(info, instance, cleaned_input)
         user = info.context.user
@@ -329,11 +335,11 @@ class AccountSetDefaultAddress(BaseMutation):
         error_type_class = AccountError
         error_type_field = "account_errors"
 
-    @classmethod
+    @ classmethod
     def check_permissions(cls, context):
         return context.user.is_authenticated
 
-    @classmethod
+    @ classmethod
     def perform_mutation(cls, _root, info, **data):
         address = cls.get_node_or_error(info, data.get("id"), Address)
         user = info.context.user
@@ -376,11 +382,11 @@ class RequestEmailChange(BaseMutation):
         error_type_class = AccountError
         error_type_field = "account_errors"
 
-    @classmethod
+    @ classmethod
     def check_permissions(cls, context):
         return context.user.is_authenticated
 
-    @classmethod
+    @ classmethod
     def perform_mutation(cls, _root, info, **data):
         user = info.context.user
         password = data["password"]
@@ -433,11 +439,11 @@ class ConfirmEmailChange(BaseMutation):
         error_type_class = AccountError
         error_type_field = "account_errors"
 
-    @classmethod
+    @ classmethod
     def check_permissions(cls, context):
         return context.user.is_authenticated
 
-    @classmethod
+    @ classmethod
     def get_token_payload(cls, token):
         try:
             payload = jwt_decode(token)
@@ -452,7 +458,7 @@ class ConfirmEmailChange(BaseMutation):
             )
         return payload
 
-    @classmethod
+    @ classmethod
     def perform_mutation(cls, _root, info, **data):
         user = info.context.user
         token = data["token"]
