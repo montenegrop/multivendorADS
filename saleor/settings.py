@@ -32,7 +32,7 @@ def get_bool_from_env(name, default_value):
     return default_value
 
 
-NAME_OF_SERVICES_CATEGORY = "SERVICES"
+NAME_OF_SERVICES_CATEGORY = "SERVICIOS"
 NAME_OF_SERVICES_PRODUCT_TYPE = "Servicio"
 
 DEBUG = get_bool_from_env("DEBUG", True)
