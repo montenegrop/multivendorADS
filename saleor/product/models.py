@@ -337,6 +337,11 @@ class BaseProduct(models.Model):
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=255, unique=True, allow_unicode=True)
 
+    def save(self, **kwargs):
+        slug_str = self.name
+        unique_slugify(self, slug_str)
+        super(BaseProduct, self).save(**kwargs)
+
 
 class Product(SeoModel, ModelWithMetadata):
     product_type = models.ForeignKey(

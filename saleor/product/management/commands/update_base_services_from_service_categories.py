@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from tqdm import tqdm
 
 from saleor.product.models import BaseProduct, Category, ProductType
+from saleor.core.utils import generate_unique_slug
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,10 @@ class Command(BaseCommand):
             new_product, created = BaseProduct.objects.get_or_create(
                 name=service_subcategory.name,
             )
-            print(new_product.name, created)
-            service_subcategory.category = service_subcategory
-            service_subcategory.product_type = service_product_type
-            service_subcategory.save()
+            # print(new_product.name, created)
+            if created:
+                print(new_product.slug)
+            new_product.category = service_subcategory
+            new_product.product_type = service_product_type
+            new_product.save()
+            print(new_product.slug, new_product.name, new_product.category.name)
