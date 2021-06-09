@@ -184,6 +184,8 @@ class ProductQueries(graphene.ObjectType):
         filter=BaseProductFilterInput(
             description="Filtering options for base products."),
         description="List of the base products.",
+        only_services=graphene.Boolean(
+            description="If true: only shows base_services", required=False)
     )
     products = ChannelContextFilterConnectionField(
         Product,
@@ -254,8 +256,8 @@ class ProductQueries(graphene.ObjectType):
         description="List of top selling products.",
     )
 
-    def resolve_base_products(self, info, vendor_id=None, **kwargs):
-        return resolve_base_products(info, vendor_id, **kwargs)
+    def resolve_base_products(self, info, only_services=False, **kwargs):
+        return resolve_base_products(info, only_services, **kwargs)
 
     def resolve_categories(self, info, level=None, **kwargs):
         return resolve_categories(info, level=level, **kwargs)

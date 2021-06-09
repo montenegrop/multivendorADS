@@ -1,5 +1,7 @@
 from typing import Union
 
+from saleor import settings
+
 from django.db.models import Sum
 from promise import Promise
 
@@ -25,10 +27,12 @@ def resolve_category_by_slug(slug):
     return models.Category.objects.filter(slug=slug).first()
 
 
-def resolve_base_products(info, vendor_id, **_kwargs):
-    if vendor_id:
-        pass
-    qs = models.BaseProduct.objects.all()
+def resolve_base_products(info, only_services, **_kwargs):
+    if only_services:
+        qs = models.BaseProduct.objects.filter(
+            category__parent__name=settings.NAME_OF_SERVICES_CATEGORY)
+    else:
+        qs = models.BaseProduct.objects.all()
     return qs.distinct()
 
 # corregir: por que esto de "children"
