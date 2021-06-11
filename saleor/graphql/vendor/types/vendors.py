@@ -2,7 +2,11 @@
 import graphene
 from graphene_federation import key
 from graphene import relay
-from graphene_django.types import DjangoObjectType
+from graphene_django.types import DjangoObjectType, ObjectType
+
+from saleor.graphql.core.fields import (
+    FilterInputConnectionField,
+)
 
 from saleor.graphql.core.types import (
     Upload,
@@ -19,6 +23,7 @@ from saleor.graphql.vendor.dataloaders.vendors import (
 )
 
 from saleor.vendors import models
+from saleor.account.models import User
 
 from saleor.product.models import Category as CategoryModel
 from saleor.product.models import PastExperience as PastExperienceModel
@@ -120,9 +125,42 @@ class VendorMainImage(DjangoObjectType):
 
 
 @key(fields="id")
+class ServiceContact(ObjectType):
+
+    first_name = graphene.String(description="Name and last name.")
+    last_name = graphene.String(description="Name and last name.")
+    full_name = graphene.String(description="Full name.")
+    phone = graphene.String(description="Phone: might not be cellphone.")
+    celphone = graphene.String(description="Cellphone.")
+    city = graphene.String(description="City.")
+    postal_code = graphene.String(description="Postal code.")
+    city_with_code = graphene.String(
+        description="City with postal code, ex: Rosario(2000).")
+    address = graphene.String(description="Address: Street and postal code.")
+    email = graphene.String(description="Email.")
+    # social_media = graphene.List(SocialMedia, description="Social media information.")
+
+    # @staticmethod
+    # def resolve_social_media(root, info, **_kwargs):
+    #     ''' load toma tambien la variable last '''
+    #     return root.full_name
+
+    @staticmethod
+    def resolve_full_name(root, info, **_kwargs):
+        return root.first_name + root.last_name
+
+    @staticmethod
+    def resolve_city_with_code(root, info, **_kwargs):
+        return f'{root.city} ({root.postal_code})'
+
+
+@key(fields="id")
 class Vendor(CountableDjangoObjectType):
 
-    past_experiences = graphene.List(
+    service_contact = graphene.Field(
+        ServiceContact, description="Contact fields for service providers.")
+
+    past_experiences = FilterInputConnectionField(
         PastExperience, description="Past experiences when vendor gives services.")
 
     main_image = graphene.Field(VendorMainImage, description="Vendor main image.")
@@ -160,6 +198,28 @@ class Vendor(CountableDjangoObjectType):
             "services",
         ]
 
+    @staticmethod
+    def resolve_service_contact(root: models.Vendor, info, **_kwargs):
+        # corregir: user with vendor first()
+        user_of_vendor = User.objects.filter(vendor=root).first()
+        first_name = user_of_vendor.first_name
+        last_name = user_of_vendor.last_name
+        email = user_of_vendor.email
+        phone = user_of_vendor.phone
+        location = root.location
+        # address = location.full_address
+        city = location.city
+        postal_code = location.postal_code
+
+        return ServiceContact(
+            first_name=first_name,
+            last_name=last_name,
+            phone=phone,
+            email=email,
+            city=city,
+            postal_code=postal_code
+        )
+
     # corregir: (formato imagen banner, ver get_adjusted)
     @staticmethod
     def resolve_main_image(root: models.Vendor, info, size=None, **_kwargs):
@@ -191,6 +251,8 @@ class Vendor(CountableDjangoObjectType):
     @staticmethod
     def resolve_past_experiences(root: models.Vendor, info, **_kwargs):
         return PastExperienceModel.objects.exclude(description_short__isnull=True)
+        # return PastExperiencesByVendorIdLoader(info.context).load(root.id)
+
 
 # Input para mutaciones:
 

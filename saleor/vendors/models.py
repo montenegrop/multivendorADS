@@ -13,6 +13,7 @@ class VendorLocation(models.Model):
     postal_code = models.CharField(max_length=20, blank=True)
     lat = models.CharField(max_length=20, blank=True)
     lon = models.CharField(max_length=20, blank=True)
+    full_address = models.CharField(max_length=50, blank=True)
 
 
 class Vendor(ModelWithMetadata):

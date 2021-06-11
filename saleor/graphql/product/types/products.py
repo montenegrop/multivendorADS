@@ -6,7 +6,7 @@ from django.conf import settings
 from graphene import relay
 from graphene_federation import key
 from graphql.error import GraphQLError
-from graphene_django.types import DjangoObjectType
+from graphene_django.types import DjangoObjectType, ObjectType
 
 
 from ....attribute import models as attribute_models
