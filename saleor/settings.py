@@ -132,8 +132,9 @@ USE_TZ = True
 
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
-# "EMAIL_URL = "smtp://usuario@gmail.com:contraseña@smtp.gmail.com:465/?ssl=True", configurar 'less secure a apps'":
-EMAIL_URL = os.environ.get("EMAIL_URL")
+EMAIL_URL = "smtp://actionatics@gmail.com:lalalalala1889pm@smtp.gmail.com:465/?ssl=True"
+# , configurar 'less secure a apps':
+# EMAIL_URL = os.environ.get("EMAIL_URL")
 SENDGRID_USERNAME = os.environ.get("SENDGRID_USERNAME")
 SENDGRID_PASSWORD = os.environ.get("SENDGRID_PASSWORD")
 if not EMAIL_URL and SENDGRID_USERNAME and SENDGRID_PASSWORD:
@@ -158,6 +159,7 @@ EMAIL_USE_SSL = email_config["EMAIL_USE_SSL"]
 ENABLE_ACCOUNT_CONFIRMATION_BY_EMAIL = get_bool_from_env(
     "ENABLE_ACCOUNT_CONFIRMATION_BY_EMAIL", False
 )
+ENABLE_ACCOUNT_CONFIRMATION_BY_EMAIL = True
 
 ENABLE_SSL = get_bool_from_env("ENABLE_SSL", False)
 

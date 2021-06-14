@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-10 12:31+0000\n"
+"POT-Creation-Date: 2021-06-14 22:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -269,7 +269,16 @@ msgid ""
 msgstr ""
 
 #: templates/templated_email/order/confirm_fulfillment.email:15
-#: templates/templated_email/source/confirm_fulfillment.mjml:25
+#, python-format
+msgctxt "Fulfillment confirmation email text with order details"
+msgid ""
+"\n"
+"To see your order details please visit:\n"
+"%(order_details_url)s\n"
+msgstr ""
+
+#: templates/templated_email/order/confirm_fulfillment.email:21
+#: templates/templated_email/source/confirm_fulfillment.mjml:31
 #: templates/templated_email/source/update_fulfillment.mjml:25
 #, python-format
 msgctxt "Fulfillment confirmation email text"
@@ -592,12 +601,21 @@ msgid ""
 "first. Please click the link below to do so and log into your account."
 msgstr ""
 
-#: templates/templated_email/source/confirm_fulfillment.mjml:16
+#: templates/templated_email/source/confirm_fulfillment.mjml:17
+#, python-format
+msgctxt "Fulfillment confirmation email text with order details"
+msgid ""
+"Thank you for your order. Below is the list of fulfilled products. To see "
+"your order details please visit: <a href=\"%(order_details_url)s\">"
+"%(order_details_url)s</a>"
+msgstr ""
+
+#: templates/templated_email/source/confirm_fulfillment.mjml:21
 msgctxt "Fulfillment confirmation email text"
 msgid "Thank you for your order. Below is the list of fulfilled products."
 msgstr ""
 
-#: templates/templated_email/source/confirm_fulfillment.mjml:21
+#: templates/templated_email/source/confirm_fulfillment.mjml:27
 #: templates/templated_email/source/update_fulfillment.mjml:21
 #, python-format
 msgctxt "Fulfillment confirmation email text"
@@ -606,7 +624,7 @@ msgid ""
 "%(tracking_number)s</a> link."
 msgstr ""
 
-#: templates/templated_email/source/confirm_fulfillment.mjml:33
+#: templates/templated_email/source/confirm_fulfillment.mjml:39
 msgctxt "Fulfillment digital products email text"
 msgid "You can download your digital products by clicking in download link(s)."
 msgstr ""

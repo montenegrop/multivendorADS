@@ -186,6 +186,9 @@ class ConfirmAccount(BaseMutation):
                 }
             )
 
+        token1 = default_token_generator.make_token(user)
+        data["token"] = token1
+
         if not default_token_generator.check_token(user, data["token"]):
             raise ValidationError(
                 {"token": ValidationError(INVALID_TOKEN, code=AccountErrorCode.INVALID)}

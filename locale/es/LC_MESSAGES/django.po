@@ -506,7 +506,7 @@ msgstr "Atentamente, %(site_name)s"
 #: templates/templated_email/source/update_fulfillment.mjml:13
 msgctxt "Standard e-mail greeting"
 msgid "Hi!"
-msgstr "Hola!"
+msgstr "x1!"
 
 #: templates/templated_email/source/account_delete.mjml:16
 #, python-format
@@ -524,7 +524,7 @@ msgctxt "Account confirmation e-mail text"
 msgid ""
 "In order to log into %(site_name)s, you have to confirm your email address "
 "first. Please click the link below to do so and log into your account."
-msgstr ""
+msgstr "Para poder confirmar tu cuenta de %(site_name)s, debes hacer click en el siguiente link"
 
 #: templates/templated_email/source/confirm_fulfillment.mjml:16
 msgctxt "Fulfillment confirmation email text"
