@@ -107,12 +107,9 @@ class AccountRegister(ModelMutation):
     def save(cls, info, user, cleaned_input):
         password = cleaned_input["password"]
         if cleaned_input["provides_services"]:
-            # vendor location:
-            vendor_location = VendorLocation.objects.create(
-                city="Rosario", province="Santa Fe")
             # vendor:
             vendor = Vendor.objects.create(
-                name=user.email, slug=user.email + '_slug', location=vendor_location)
+                name=user.email, slug=user.email + '_slug')
             user.vendor = vendor
             # user permissions:
 

@@ -125,6 +125,25 @@ class VendorMainImage(DjangoObjectType):
 
 
 @key(fields="id")
+class VendorSocialMedia(ObjectType):
+    code = graphene.String(description="Social media code.")
+    user_string = graphene.String(description="Social media user, not url.")
+    url = graphene.String(description="Full social media url of vendor.")
+
+    @staticmethod
+    def resolve_code(root, info, **_kwargs):
+        return "IG"
+
+    @staticmethod
+    def resolve_user(root, info, **_kwargs):
+        return "marizzadenoche"
+
+    @staticmethod
+    def resolve_url(root, info, **_kwargs):
+        return "https://www.instagram.com/marizzadenoche/"
+
+
+@key(fields="id")
 class ServiceContact(ObjectType):
 
     first_name = graphene.String(description="Name and last name.")
@@ -281,3 +300,8 @@ class VendorLocationCreateOrUpdateInput(graphene.InputObjectType):
     postal_code = graphene.String(description="Vendor postal code.", required=False)
     lat = graphene.String(description="Vendor lat.", required=False)
     lon = graphene.String(description="Vendor lon.", required=False)
+
+
+class VendorSocialMediaUpdateInput(graphene.InputObjectType):
+    code = graphene.String(description="Social media code", required=True)
+    user_string = graphene.String(description="Social media username.", required=False)

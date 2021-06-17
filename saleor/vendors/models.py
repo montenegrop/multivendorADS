@@ -44,6 +44,22 @@ class Vendor(ModelWithMetadata):
     services = models.ManyToManyField('product.BaseProduct', blank=True)
 
 
+SOCIAL_MEDIA_CHOICES = [
+    ("IG", "Instagram"), ("FB", "Facebook"), ("TW", "Twitter")
+]
+
+
+class SocialMedia(models.Model):
+    code = models.CharField(max_length=3,
+                            blank=True,
+                            choices=SOCIAL_MEDIA_CHOICES,
+                            )
+    user_string = models.CharField(max_length=30, blank=True)
+
+    vendor = models.ForeignKey(
+        Vendor, related_name="social_media", on_delete=models.CASCADE)
+
+
 class VendorContact(models.Model):
     Vendor = models.ForeignKey(
         Vendor, related_name="contacts", on_delete=models.CASCADE)

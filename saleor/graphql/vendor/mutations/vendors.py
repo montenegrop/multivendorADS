@@ -11,6 +11,8 @@ from saleor.graphql.vendor.types.vendors import (
     VendorImageCreateInput,
     VendorCreateOrUpdateInput,
     VendorLocationCreateOrUpdateInput,
+    VendorSocialMedia,
+    VendorSocialMediaUpdateInput,
 )
 from saleor.graphql.core.utils import validate_image_file
 from saleor.graphql.core.types.common import VendorError
@@ -54,6 +56,52 @@ class VendorCreateOrUpdate(ModelMutation):
     @transaction.atomic
     def save(cls, info, instance, cleaned_input):
         instance.save()
+
+
+class VendorSocialMediaUpdate(BaseMutation):
+    social_media = graphene.List(
+        graphene.String, description="Codes of updated social media.")
+
+    class Arguments:
+        social_media = graphene.List(
+            VendorSocialMediaUpdateInput,
+            description="list of IDs of base product services to modify.",
+            required=True)
+
+    # corregir: permisos
+    class Meta:
+        description = (
+            "update social media of vendor."
+        )
+        error_type_class = VendorError
+        error_type_field = "vendor_errors"
+
+    @classmethod
+    def perform_mutation(cls, _root, info, **data):
+        social_media_tuples = data.get("social_media")
+        vendor_id = info.context.user.vendor_id
+        vendor = models.Vendor.objects.get(id=vendor_id)
+
+        updated = []
+
+        for social_media in social_media_tuples:
+            social_media_model, created = models.SocialMedia.objects.get_or_create(
+                vendor=vendor, code=social_media["code"])
+            social_media_model.user_string = social_media["user_string"]
+            updated.append(social_media["code"])
+            social_media_model.save()
+
+        # # borrar servicios que no provee más:
+        # services_to_be_removed = vendor.services.exclude(id__in=ids_of_services)
+        # vendor.services.remove(*services_to_be_removed)
+
+        # # agregar servicios nuevos:
+        # vendor.services.add(*ids_of_services)
+
+        # services = []
+        # [services.append(service.name) for service in vendor.services.all()]
+
+        return VendorSocialMediaUpdate(social_media=updated)
 
 
 class VendorServicesUpdate(BaseMutation):

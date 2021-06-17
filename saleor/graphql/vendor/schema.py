@@ -12,6 +12,7 @@ from saleor.graphql.vendor.mutations.vendors import (
     VendorLocationCreateOrUpdate,
     VendorImageCreate,
     VendorServicesUpdate,
+    VendorSocialMediaUpdate,
 )
 
 
@@ -39,3 +40,4 @@ class VendorMutations(graphene.ObjectType):
     vendor_location_create_or_update = VendorLocationCreateOrUpdate.Field()
     vendor_image_create_or_update = VendorImageCreate.Field()
     vendor_services_update = VendorServicesUpdate.Field()
+    vendor_social_media_update = VendorSocialMediaUpdate.Field()
