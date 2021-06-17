@@ -130,17 +130,17 @@ class VendorSocialMedia(ObjectType):
     user_string = graphene.String(description="Social media user, not url.")
     url = graphene.String(description="Full social media url of vendor.")
 
-    @staticmethod
-    def resolve_code(root, info, **_kwargs):
-        return "IG"
+    # @staticmethod
+    # def resolve_code(root, info, **_kwargs):
+    #     return "IG"
 
-    @staticmethod
-    def resolve_user(root, info, **_kwargs):
-        return "marizzadenoche"
+    # @staticmethod
+    # def resolve_user(root, info, **_kwargs):
+    #     return "marizzadenoche"
 
     @staticmethod
     def resolve_url(root, info, **_kwargs):
-        return "https://www.instagram.com/marizzadenoche/"
+        return "https://www.instagram.com/" + root.code
 
 
 @key(fields="id")
@@ -192,6 +192,8 @@ class Vendor(CountableDjangoObjectType):
         lambda: Category, description="List of level 0 categories used by the vendor."
     )
 
+    social_media = graphene.List(VendorSocialMedia, description="Vendor social media.")
+
     class Meta:
         description = "Represents a vendor in the storefront."
         interfaces = [relay.Node, ObjectWithMetadata]
@@ -216,6 +218,14 @@ class Vendor(CountableDjangoObjectType):
             "contacts",
             "services",
         ]
+
+    @staticmethod
+    def resolve_social_media(root: models.Vendor, infor, **_kwargs):
+        social_media_list = []
+        for social_media in root.social_media.all():
+            social_media_list.append(VendorSocialMedia(
+                code=social_media.code, user_string=social_media.user_string))
+        return social_media_list
 
     @staticmethod
     def resolve_service_contact(root: models.Vendor, info, **_kwargs):

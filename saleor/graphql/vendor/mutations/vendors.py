@@ -60,7 +60,7 @@ class VendorCreateOrUpdate(ModelMutation):
 
 class VendorSocialMediaUpdate(BaseMutation):
     social_media = graphene.List(
-        graphene.String, description="Codes of updated social media.")
+        VendorSocialMedia, description="Social media of vendor.")
 
     class Arguments:
         social_media = graphene.List(
@@ -88,18 +88,9 @@ class VendorSocialMediaUpdate(BaseMutation):
             social_media_model, created = models.SocialMedia.objects.get_or_create(
                 vendor=vendor, code=social_media["code"])
             social_media_model.user_string = social_media["user_string"]
-            updated.append(social_media["code"])
+            updated.append(VendorSocialMedia(
+                code=social_media["code"], user_string=social_media["user_string"]))
             social_media_model.save()
-
-        # # borrar servicios que no provee más:
-        # services_to_be_removed = vendor.services.exclude(id__in=ids_of_services)
-        # vendor.services.remove(*services_to_be_removed)
-
-        # # agregar servicios nuevos:
-        # vendor.services.add(*ids_of_services)
-
-        # services = []
-        # [services.append(service.name) for service in vendor.services.all()]
 
         return VendorSocialMediaUpdate(social_media=updated)
 
