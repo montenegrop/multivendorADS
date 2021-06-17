@@ -117,3 +117,11 @@ class VendorMainImage(VendorGeneralImage, models.Model):
         related_name="main_image",
         on_delete=models.CASCADE,
     )
+
+
+class VendorAvatarImage(VendorGeneralImage, models.Model):
+    vendor = models.ForeignKey(
+        Vendor,
+        related_name="avatar_image",
+        on_delete=models.CASCADE,
+    )

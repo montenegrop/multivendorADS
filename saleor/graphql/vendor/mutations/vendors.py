@@ -144,6 +144,7 @@ class VendorLocationCreateOrUpdate(ModelMutation):
         )
 
     # corregir:
+
     class Meta:
         description = "Modify vendor location."
         permissions = ("is_superuser")
@@ -183,8 +184,10 @@ class VendorImageCreate(BaseMutation):
     class Arguments:
         input = VendorImageCreateInput(
             description="Fields required to create a product image.")
+        is_avatar = graphene.Boolean(required=False, description="Is avatar mutation.")
 
     # corregir: permisos (solo servicios?) y ver errores
+
     class Meta:
         description = (
             "Create a vendor image."
@@ -204,12 +207,18 @@ class VendorImageCreate(BaseMutation):
         validate_image_file(image_data, "image")
 
         if "position" in data.keys():
-
             image = vendor.service_images.filter(position=int(data['position'])).last()
             if not image:
                 image = vendor.service_images.create(position=int(data['position']))
             image.image = image_data
             image.title = data.get("title", "")
+
+        elif data.get("is_avatar"):
+            image = vendor.avatar_image.last()
+            if not image:
+                image = vendor.avatar_image.create(image=image_data)
+            else:
+                image.image = image_data
 
         else:
             image = vendor.main_image.last()

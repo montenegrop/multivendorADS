@@ -102,14 +102,37 @@ class VendorServiceImage(CountableDjangoObjectType):
 
 
 @key(fields="id")
-class VendorMainImage(DjangoObjectType):
+class VendorAvatarImage(DjangoObjectType):
     url = graphene.String(
-        description="The URL of the image.",
+        description="The URL of the avatar image.",
         size=graphene.Int(description="Size of the image."),
     )
 
     class Meta:
-        description = "Represents a vendor main image."
+        description = "Represents the vendor's avatar image."
+        only_fields = ["alt", "id"]
+        interfaces = [relay.Node]
+        model = models.VendorAvatarImage
+
+    @staticmethod
+    def resolve_url(root: models.VendorAvatarImage, info, *, size=None):
+        if size:
+            pass
+            # url = get_thumbnail(root.image, size, method="thumbnail")
+        else:
+            url = root.image.url
+        return info.context.build_absolute_uri(url)
+
+
+@key(fields="id")
+class VendorMainImage(DjangoObjectType):
+    url = graphene.String(
+        description="The URL of the main image.",
+        size=graphene.Int(description="Size of the image."),
+    )
+
+    class Meta:
+        description = "Represent the vendor's main image."
         only_fields = ["alt", "id"]
         interfaces = [relay.Node]
         model = models.VendorMainImage
@@ -183,6 +206,8 @@ class Vendor(CountableDjangoObjectType):
         PastExperience, description="Past experiences when vendor gives services.")
 
     main_image = graphene.Field(VendorMainImage, description="Vendor main image.")
+
+    avatar_image = graphene.Field(VendorAvatarImage, description="Vendor main image.")
 
     service_images = graphene.List(
         lambda: VendorServiceImage, description="List of service images for the vendor."
@@ -263,6 +288,11 @@ class Vendor(CountableDjangoObjectType):
         #         rendition_key_set="main_images",
         #         info=info,
         #     )
+
+    @staticmethod
+    def resolve_avatar_image(root: models.Vendor, info, size=None, **_kwargs):
+        if root.avatar_image:
+            return models.VendorAvatarImage.objects.filter(vendor_id=root.id).last()
 
     @staticmethod
     def resolve_service_images(root: models.Vendor, info, **_kwargs):
