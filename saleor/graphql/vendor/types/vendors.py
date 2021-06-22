@@ -309,7 +309,10 @@ class Vendor(CountableDjangoObjectType):
 
     @staticmethod
     def resolve_past_experiences(root: models.Vendor, info, **_kwargs):
-        return PastExperienceModel.objects.exclude(description_short__isnull=True)
+        return PastExperienceModel.objects.exclude(
+            description_short__isnull=True,
+            product__isnull=True
+        )
         # return PastExperiencesByVendorIdLoader(info.context).load(root.id)
 
 
@@ -326,7 +329,7 @@ class VendorCreateOrUpdateInput(graphene.InputObjectType):
         description="Vendor description (HTML/text).", required=False)
 
 
-class VendorImageCreateInput(graphene.InputObjectType):
+class VendorImageCreateOrUpdateInput(graphene.InputObjectType):
     vendor_id = graphene.ID(required=True, description="ID of a vendor.")
     image = Upload(required=True, description="Image file.")
     title = graphene.String(required=False, description="Image title.")

@@ -1211,7 +1211,6 @@ class PastExperience(CountableDjangoObjectType):
             "description_long",
             "past_experience_images",
             "location",
-            "product",
         ]
 
     @staticmethod

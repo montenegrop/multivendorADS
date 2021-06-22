@@ -544,18 +544,14 @@ class PastExperienceCreate(ModelMutation):
         error_type_field = "product_errors"
 
     @classmethod
-    def mutate(cls, root, info, **data):
-        response = super().mutate(root, info, **data)
-        return response
-
-    @classmethod
-    def clean_input(cls, info, instance, data):
-        return super().clean_input(info, instance, data)
-
-    @classmethod
     @transaction.atomic
     def save(cls, info, instance, cleaned_input):
-        instance.save()
+        if 'service_id' in cleaned_input.keys():
+            vendor = info.context.user.vendor
+            product = vendor.products.filter(
+                base_product=cleaned_input['service_id']).last()
+            instance.product = product
+        super().save(info, instance, cleaned_input)
 
     # @ classmethod
     # def mutate(cls, root, info, **data):

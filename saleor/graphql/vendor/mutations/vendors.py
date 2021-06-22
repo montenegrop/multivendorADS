@@ -8,7 +8,7 @@ from saleor.graphql.vendor.types.vendors import (
     VendorLocation,
     VendorServiceImage,
     # VendorMainImage,
-    VendorImageCreateInput,
+    VendorImageCreateOrUpdateInput,
     VendorCreateOrUpdateInput,
     VendorLocationCreateOrUpdateInput,
     VendorSocialMedia,
@@ -19,6 +19,7 @@ from saleor.graphql.core.types.common import VendorError
 
 
 from saleor.vendors import models
+from saleor.product.models import Product as ProductModel
 from saleor.graphql.core.mutations import (
     BaseMutation,
     ModelMutation
@@ -103,7 +104,7 @@ class VendorServicesUpdate(BaseMutation):
         services = graphene.List(
             graphene.ID, description="list of IDs of base product services to modify.", required=True)
 
-    # corregir: permisos
+    # corregir: permisos, borrar productos de servicios que no usa mas
     class Meta:
         description = (
             "update services provided by vendor."
@@ -129,7 +130,16 @@ class VendorServicesUpdate(BaseMutation):
         vendor.services.add(*ids_of_services)
 
         services = []
-        [services.append(service.name) for service in vendor.services.all()]
+
+        for service in vendor.services.all():
+            services.append(service.name)
+            product, created = ProductModel.objects.get_or_create(
+                vendor=vendor,
+                base_product=service,
+                product_type=service.product_type,
+                category=service.category
+            )
+            product.save()
 
         return VendorServicesUpdate(services=services)
 
@@ -177,12 +187,12 @@ class VendorLocationCreateOrUpdate(ModelMutation):
             info.context.user.vendor.save()
 
 
-class VendorImageCreate(BaseMutation):
+class VendorImageCreateOrUpdate(BaseMutation):
     vendor = graphene.Field(Vendor)
     image_url = graphene.String(description="images' url")
 
     class Arguments:
-        input = VendorImageCreateInput(
+        input = VendorImageCreateOrUpdateInput(
             description="Fields required to create a product image.")
         is_avatar = graphene.Boolean(required=False, description="Is avatar mutation.")
 
@@ -232,4 +242,4 @@ class VendorImageCreate(BaseMutation):
 
         image_url = image.image.url
 
-        return VendorImageCreate(vendor=vendor, image_url=image_url)
+        return VendorImageCreateOrUpdate(vendor=vendor, image_url=image_url)
