@@ -548,7 +548,7 @@ class PastExperienceCreate(ModelMutation):
     def save(cls, info, instance, cleaned_input):
         if 'service_id' in cleaned_input.keys():
             vendor = info.context.user.vendor
-            product = models.Product.objects.get_or_create(
+            product, created = models.Product.objects.get_or_create(
                 vendor=vendor, base_product_id=cleaned_input['service_id'])
             instance.product = product
         super().save(info, instance, cleaned_input)
