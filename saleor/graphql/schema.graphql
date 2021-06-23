@@ -2628,8 +2628,9 @@ input MoveProductInput {
 type Mutation {
   vendorCreateOrUpdate(id: ID, input: VendorCreateOrUpdateInput!): VendorCreateOrUpdate
   vendorLocationCreateOrUpdate(id: ID, input: VendorLocationCreateOrUpdateInput!): VendorLocationCreateOrUpdate
-  vendorImageCreateOrUpdate(input: VendorImageCreateInput): VendorImageCreate
+  vendorImageCreateOrUpdate(input: VendorImageCreateOrUpdateInput, isAvatar: Boolean): VendorImageCreateOrUpdate
   vendorServicesUpdate(services: [ID]!): VendorServicesUpdate
+  vendorSocialMediaUpdate(socialMedia: [VendorSocialMediaUpdateInput]!): VendorSocialMediaUpdate
   webhookCreate(input: WebhookCreateInput!): WebhookCreate
   webhookDelete(id: ID!): WebhookDelete
   webhookUpdate(id: ID!, input: WebhookUpdateInput!): WebhookUpdate
@@ -3569,13 +3570,23 @@ type PasswordChange {
 
 type PastExperience implements Node {
   id: ID!
-  product: Product
   location: ExperienceLocation
   descriptionShort: String!
   descriptionLong: String!
   yearPerformed: Int
   pastExperienceImages(before: String, after: String, first: Int, last: Int): PastExperienceImageCountableConnection!
   service: BaseProduct
+}
+
+type PastExperienceCountableConnection {
+  pageInfo: PageInfo!
+  edges: [PastExperienceCountableEdge!]!
+  totalCount: Int
+}
+
+type PastExperienceCountableEdge {
+  node: PastExperience!
+  cursor: String!
 }
 
 type PastExperienceCreate {
@@ -4535,7 +4546,7 @@ type Query {
   collection(id: ID, slug: String, channel: String): Collection
   collections(filter: CollectionFilterInput, sortBy: CollectionSortingInput, channel: String, before: String, after: String, first: Int, last: Int): CollectionCountableConnection
   product(id: ID, slug: String, channel: String): Product
-  baseProducts(vendorId: String, filter: BaseProductFilterInput, before: String, after: String, first: Int, last: Int): BaseProductCountableConnection
+  baseProducts(vendorId: String, filter: BaseProductFilterInput, onlyServices: Boolean, before: String, after: String, first: Int, last: Int): BaseProductCountableConnection
   products(filter: ProductFilterInput, sortBy: ProductOrder, stockAvailability: StockAvailability, channel: String, vendor: Boolean = false, before: String, after: String, first: Int, last: Int): ProductCountableConnection
   productType(id: ID!): ProductType
   productTypes(filter: ProductTypeFilterInput, sortBy: ProductTypeSortingInput, before: String, after: String, first: Int, last: Int): ProductTypeCountableConnection
@@ -4774,6 +4785,19 @@ type SelectedAttribute {
 input SeoInput {
   title: String
   description: String
+}
+
+type ServiceContact {
+  firstName: String
+  lastName: String
+  fullName: String
+  phone: String
+  celphone: String
+  city: String
+  postalCode: String
+  cityWithCode: String
+  address: String
+  email: String
 }
 
 type SetPassword {
@@ -5583,10 +5607,19 @@ type Vendor implements Node & ObjectWithMetadata {
   contacts: [VendorContact!]!
   privateMetadata: [MetadataItem]!
   metadata: [MetadataItem]!
-  pastExperiences: [PastExperience]
+  serviceContact: ServiceContact
+  pastExperiences(before: String, after: String, first: Int, last: Int): PastExperienceCountableConnection
   mainImage: VendorMainImage
+  avatarImage: VendorAvatarImage
   serviceImages: [VendorServiceImage]
   mainCategories: [Category]
+  socialMedia: [VendorSocialMedia]
+}
+
+type VendorAvatarImage implements Node {
+  id: ID!
+  alt: String!
+  url(size: Int): String
 }
 
 type VendorContact {
@@ -5646,14 +5679,14 @@ enum VendorErrorCode {
   UNIQUE
 }
 
-type VendorImageCreate {
+type VendorImageCreateOrUpdate {
   errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
   vendor: Vendor
   imageUrl: String
   vendorErrors: [VendorError!]!
 }
 
-input VendorImageCreateInput {
+input VendorImageCreateOrUpdateInput {
   vendorId: ID!
   image: Upload!
   title: String
@@ -5669,6 +5702,7 @@ type VendorLocation {
   postalCode: String!
   lat: String!
   lon: String!
+  fullAddress: String!
   vendorSet(before: String, after: String, first: Int, last: Int): VendorCountableConnection!
 }
 
@@ -5705,6 +5739,23 @@ type VendorServicesUpdate {
   errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
   services: [String]
   vendorErrors: [VendorError!]!
+}
+
+type VendorSocialMedia {
+  code: String
+  userString: String
+  url: String
+}
+
+type VendorSocialMediaUpdate {
+  errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
+  socialMedia: [VendorSocialMedia]
+  vendorErrors: [VendorError!]!
+}
+
+input VendorSocialMediaUpdateInput {
+  code: String!
+  userString: String
 }
 
 enum VendorSortField {
@@ -6122,7 +6173,7 @@ enum WeightUnitsEnum {
 
 scalar _Any
 
-union _Entity = ProductVariant | BaseProduct | Product | ProductType | Collection | Category | ProductImage | PastExperienceImage | ExperienceLocation | PastExperience | VendorLocation | VendorContact | VendorServiceImage | VendorMainImage | Vendor | Address | User | Group | App | PageType
+union _Entity = ProductVariant | BaseProduct | Product | ProductType | Collection | Category | ProductImage | PastExperienceImage | ExperienceLocation | PastExperience | VendorLocation | VendorContact | VendorServiceImage | VendorAvatarImage | VendorMainImage | VendorSocialMedia | ServiceContact | Vendor | Address | User | Group | App | PageType
 
 type _Service {
   sdl: String
