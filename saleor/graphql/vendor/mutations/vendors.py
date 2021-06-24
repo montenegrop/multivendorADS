@@ -208,20 +208,22 @@ class VendorImageCreateOrUpdate(BaseMutation):
 
     @classmethod
     def perform_mutation(cls, _root, info, **data):
-        data = data.get("input")
+        input_data = data.get("input")
         vendor = cls.get_node_or_error(
-            info, data["vendor_id"], field="vendor", only_type=Vendor
+            info, input_data["vendor_id"], field="vendor", only_type=Vendor
         )
 
-        image_data = info.context.FILES.get(data["image"])
+        image_data = info.context.FILES.get(input_data["image"])
         validate_image_file(image_data, "image")
 
-        if "position" in data.keys():
-            image = vendor.service_images.filter(position=int(data['position'])).last()
+        if "position" in input_data.keys():
+            image = vendor.service_images.filter(
+                position=int(input_data['position'])).last()
             if not image:
-                image = vendor.service_images.create(position=int(data['position']))
+                image = vendor.service_images.create(
+                    position=int(input_data['position']))
             image.image = image_data
-            image.title = data.get("title", "")
+            image.title = input_data.get("title", "")
 
         elif data.get("is_avatar"):
             image = vendor.avatar_image.last()
@@ -237,7 +239,7 @@ class VendorImageCreateOrUpdate(BaseMutation):
             else:
                 image.image = image_data
 
-        image.alt = data.get("alt", "")
+        image.alt = input_data.get("alt", "")
         image.save()
 
         image_url = image.image.url
