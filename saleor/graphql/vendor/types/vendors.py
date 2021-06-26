@@ -163,7 +163,7 @@ class VendorSocialMedia(ObjectType):
 
     @staticmethod
     def resolve_url(root, info, **_kwargs):
-        return "https://www.instagram.com/" + root.code
+        return "https://www.xd.com/" + root.code
 
 
 @key(fields="id")
