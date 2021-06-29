@@ -263,6 +263,7 @@ class User(CountableDjangoObjectType):
             "type_of_identification",
             "identification",
             "phone",
+            "cellphone",
         ]
 
     @staticmethod
