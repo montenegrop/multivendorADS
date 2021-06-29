@@ -42,6 +42,7 @@ class AccountRegisterInput(graphene.InputObjectType):
     last_name = graphene.String(description="Lasrt name.", required=False)
     provides_services = graphene.Boolean(
         description="User is service-provides.", required=False)
+    cellphone = graphene.String(description="Phone.", required=False)
 
 
 class AccountRegister(ModelMutation):
