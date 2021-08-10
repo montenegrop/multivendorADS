@@ -310,8 +310,7 @@ class Vendor(CountableDjangoObjectType):
     @staticmethod
     def resolve_past_experiences(root: models.Vendor, info, **_kwargs):
         return PastExperienceModel.objects.exclude(
-            description_short__isnull=True,
-            product__isnull=True
+            product__isnull=True,
         )
         # return PastExperiencesByVendorIdLoader(info.context).load(root.id)
 
