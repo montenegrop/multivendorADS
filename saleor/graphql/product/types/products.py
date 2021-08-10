@@ -1203,7 +1203,7 @@ class PastExperience(CountableDjangoObjectType):
     # corregir: objectwithmetadata
     class Meta:
         model = models.PastExperience
-        interfaces = [relay.Node]
+        # interfaces = [relay.Node]
         only_fields = [
             "id",
             "year_performed",
@@ -1215,4 +1215,5 @@ class PastExperience(CountableDjangoObjectType):
 
     @staticmethod
     def resolve_service(root: models.PastExperience, info):
+        print(info, 1218)
         return root.product.base_product
