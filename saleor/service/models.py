@@ -1,5 +1,3 @@
-from versatileimagefield.fields import VersatileImageField, PPOIField
-
 from django.db import models
 from saleor.account.models import User
 from saleor.vendors.models import Vendor
