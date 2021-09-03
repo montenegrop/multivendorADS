@@ -3570,7 +3570,7 @@ type PasswordChange {
   accountErrors: [AccountError!]!
 }
 
-type PastExperience implements Node {
+type PastExperience {
   id: ID!
   location: ExperienceLocation
   descriptionShort: String!
