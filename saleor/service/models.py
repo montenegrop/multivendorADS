@@ -1,7 +1,11 @@
+from django.conf import settings
+
 from django.db import models
 from saleor.account.models import User
 from saleor.vendors.models import Vendor
 from saleor.product.models import BaseProduct
+
+from django_prices.models import MoneyField
 
 from versatileimagefield.fields import PPOIField, VersatileImageField
 # Create your models here.
@@ -48,6 +52,17 @@ class VendorContractReview(models.Model):
     other_motive = models.CharField(max_length=300, default=NO_COMPLETED)
     title = models.CharField(max_length=300, default=NO_COMPLETED)
     long_review = models.CharField(max_length=1000, default=NO_COMPLETED)
+
+    currency = models.CharField(max_length=settings.DEFAULT_CURRENCY_CODE_LENGTH)
+    job_price_amount = models.DecimalField(
+        max_digits=settings.DEFAULT_MAX_DIGITS,
+        decimal_places=settings.DEFAULT_DECIMAL_PLACES,
+        blank=True,
+        null=True,
+    )
+    job_price = MoneyField(
+        amount_field="job_price_amount", currency_field="currency"
+    )
 
 
 class VendorContractReviewGeneralImage(models.Model):

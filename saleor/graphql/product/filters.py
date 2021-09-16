@@ -61,6 +61,8 @@ def _clean_product_attributes_filter_input(
 
 T_PRODUCT_FILTER_QUERIES = Dict[int, Iterable[int]]
 
+# corregir: agregar poder filtrar mas de un attributo
+
 
 def filter_products_by_attributes_values(qs, queries: T_PRODUCT_FILTER_QUERIES):
     filters = [
@@ -155,14 +157,19 @@ def filter_products_by_stock_availability(qs, stock_availability):
     return qs
 
 
+# corregir: aca la logica de varios attributos
 def filter_attributes(qs, _, value):
     if value:
         value_list = []
-        for v in value:
-            slug = v["slug"]
-            values = [v["value"]] if "value" in v else v.get("values", [])
-            value_list.append((slug, values))
-        qs = filter_products_by_attributes(qs, value_list)
+        for index in range(len(value[0]["slugs"])):
+            slug = value[0]["slugs"][index]
+            values = value[0]["values"][index]
+            value = [{'slug': slug, 'values': values}]
+            for v in value:
+                slug = v["slug"]
+                values = [v["value"]] if "value" in v else v.get("values", [])
+                value_list.append((slug, values))
+            qs = filter_products_by_attributes(qs, value_list)
     return qs
 
 
@@ -300,6 +307,8 @@ def filter_quantity(qs, quantity_value, warehouses=None):
 class ProductStockFilterInput(graphene.InputObjectType):
     warehouse_ids = graphene.List(graphene.NonNull(graphene.ID), required=False)
     quantity = graphene.Field(IntRangeInput, required=False)
+
+# corregir: agregar aca los filtros que falten
 
 
 class ProductFilter(django_filters.FilterSet):
