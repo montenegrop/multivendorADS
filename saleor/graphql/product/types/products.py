@@ -594,6 +594,7 @@ class Product(ChannelContextTypeWithMetadata, CountableDjangoObjectType):
             "weight",
             "default_variant",
             "rating",
+            "base_product",
         ]
 
     @staticmethod
