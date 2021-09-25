@@ -5,6 +5,9 @@ from saleor.vendors.models import Vendor as VendorModel
 from saleor.graphql.core.fields import (
     FilterInputConnectionField,
 )
+from saleor.graphql.core.types import FilterInputObjectType
+
+from .filters import VendorFilter
 
 from saleor.graphql.vendor.types.vendors import Vendor, VendorSortingInput
 from saleor.graphql.vendor.mutations.vendors import (
@@ -16,9 +19,15 @@ from saleor.graphql.vendor.mutations.vendors import (
 )
 
 
+class VendorFilterInput(FilterInputObjectType):
+    class Meta:
+        filterset_class = VendorFilter
+
+
 class VendorQueries(graphene.ObjectType):
     vendors = FilterInputConnectionField(
         Vendor,
+        filter=VendorFilterInput(description="Filtering options for vendors."),
         description="list all vendors",
         sort_by=VendorSortingInput(description="Sort categories."))
 
