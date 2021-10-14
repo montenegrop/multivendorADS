@@ -53,7 +53,8 @@ class VendorContractReview(models.Model):
     title = models.CharField(max_length=300, default=NO_COMPLETED)
     long_review = models.CharField(max_length=1000, default=NO_COMPLETED)
 
-    currency = models.CharField(max_length=settings.DEFAULT_CURRENCY_CODE_LENGTH)
+    currency = models.CharField(
+        max_length=settings.DEFAULT_CURRENCY_CODE_LENGTH, default=settings.DEFAULT_CURRENCY)
     job_price_amount = models.DecimalField(
         max_digits=settings.DEFAULT_MAX_DIGITS,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES,

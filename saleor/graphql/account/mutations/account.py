@@ -25,6 +25,8 @@ from .base import (
 
 from saleor.vendors.models import Vendor, VendorLocation
 
+from saleor.account.models import TYPES_OF_IDENTIFICATION, TYPES_OF_IDENTIFICATION_OPTIONS
+
 
 class AccountRegisterInput(graphene.InputObjectType):
     email = graphene.String(description="The email address of the user.", required=True)
@@ -35,7 +37,9 @@ class AccountRegisterInput(graphene.InputObjectType):
         ),
         required=False,
     )
-    type_of_identification = graphene.String(description="Type of ID.", required=False)
+    type_of_identification = graphene.Enum(
+        'type_of_identification', TYPES_OF_IDENTIFICATION_OPTIONS)(required=False)
+    # graphene.String(description="Type of ID.", required=False)
     identification = graphene.String(description="Id", required=False)
     phone = graphene.String(description="Phone.", required=False)
     first_name = graphene.String(description="First name.", required=False)
