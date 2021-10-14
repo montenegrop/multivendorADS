@@ -161,7 +161,7 @@ class SelectedAttribute(graphene.ObjectType):
 
 
 class AttributeInput(graphene.InputObjectType):
-    slug = graphene.String(required=True, description=AttributeDescriptions.SLUG)
+    slugs = graphene.List(graphene.String, required=True, description="attribute")
     value = graphene.String(
         required=False,
         description=(
@@ -170,5 +170,5 @@ class AttributeInput(graphene.InputObjectType):
         ),
     )  # deprecated
     values = graphene.List(
-        graphene.String, required=False, description=AttributeValueDescriptions.SLUG
+        graphene.List(graphene.String), required=False, description="list of attribute values"
     )

@@ -217,6 +217,9 @@ class Vendor(CountableDjangoObjectType):
         lambda: Category, description="List of level 0 categories used by the vendor."
     )
 
+    category = graphene.Field(Category, id=graphene.Argument(
+        graphene.ID, description="ID of the category."), description="To filter by a single category.")
+
     social_media = graphene.List(VendorSocialMedia, description="Vendor social media.")
 
     class Meta:
@@ -245,7 +248,7 @@ class Vendor(CountableDjangoObjectType):
         ]
 
     @staticmethod
-    def resolve_social_media(root: models.Vendor, infor, **_kwargs):
+    def resolve_social_media(root: models.Vendor, info, **_kwargs):
         social_media_list = []
         for social_media in root.social_media.all():
             social_media_list.append(VendorSocialMedia(
@@ -294,6 +297,7 @@ class Vendor(CountableDjangoObjectType):
         if root.avatar_image:
             return models.VendorAvatarImage.objects.filter(vendor_id=root.id).last()
 
+    # corregir:
     @staticmethod
     def resolve_service_images(root: models.Vendor, info, **_kwargs):
         ''' load toma tambien la variable last '''
@@ -306,6 +310,13 @@ class Vendor(CountableDjangoObjectType):
         return CategoryModel.objects.filter(
             children__in=categories).distinct().order_by(
             'relevance')
+
+    @staticmethod
+    def resolve_category(root: models.Vendor, info, **_kwargs):
+        category = CategoryModel.objects.filter(
+            products__vendor_id=root.id)
+        return CategoryModel.objects.filter(
+            children__in=category)
 
     @staticmethod
     def resolve_past_experiences(root: models.Vendor, info, **_kwargs):

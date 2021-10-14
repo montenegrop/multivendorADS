@@ -135,6 +135,23 @@ class UserManager(BaseUserManager):
         return self.get_queryset().filter(is_staff=True)
 
 
+EMPTY = 'empty'
+DNI = 'DNI'
+PASSPORT = 'pasaporte'
+
+TYPES_OF_IDENTIFICATION = [
+    (EMPTY, 'empty'),
+    (DNI, 'DNI'),
+    (PASSPORT, 'pasaporte'),
+]
+
+TYPES_OF_IDENTIFICATION_OPTIONS = [
+    ("EMPTY", EMPTY),
+    ("DNI", DNI),
+    ("PASSPORT", PASSPORT),
+]
+
+
 class User(PermissionsMixin, ModelWithMetadata, AbstractBaseUser):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=256, blank=True)
@@ -162,16 +179,6 @@ class User(PermissionsMixin, ModelWithMetadata, AbstractBaseUser):
     vendor = models.ForeignKey(
         Vendor, related_name="users", null=True, on_delete=models.CASCADE, blank=True
     )
-
-    DNI = 'DNI'
-    PASSPORT = 'pasaporte'
-    EMPTY = 'empty'
-
-    TYPES_OF_IDENTIFICATION = [
-        (EMPTY, 'empty'),
-        (DNI, 'DNI'),
-        (PASSPORT, 'pasaporte'),
-    ]
 
     type_of_identification = models.CharField(
         max_length=30,
