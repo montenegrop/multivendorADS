@@ -273,6 +273,7 @@ INSTALLED_APPS = [
     "django_countries",
     "django_filters",
     "phonenumber_field",
+    "social_django",
 ]
 
 
@@ -355,6 +356,17 @@ LOGGING = {
 }
 
 AUTH_USER_MODEL = "account.User"
+
+# Auth0 settings
+SOCIAL_AUTH_TRAILING_SLASH = False  # Remove trailing slash from routes
+SOCIAL_AUTH_AUTH0_DOMAIN = 'YOUR-AUTH0-DOMAIN'
+SOCIAL_AUTH_AUTH0_KEY = 'YOUR-AUTH0-CLIENT-ID'
+SOCIAL_AUTH_AUTH0_SECRET = 'YOUR-AUTH0-SECRET'
+SOCIAL_AUTH_AUTH0_SCOPE = [
+    'openid',
+    'profile',
+    'email'
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -473,7 +485,13 @@ SEARCH_BACKEND = "saleor.search.backends.postgresql"
 
 AUTHENTICATION_BACKENDS = [
     "saleor.core.auth_backend.JSONWebTokenBackend",
+    'social_core.backends.auth0.Auth0OAuth2',
 ]
+
+# webappexample\settings.py
+
+LOGIN_URL = '/login/auth0'
+LOGIN_REDIRECT_URL = '/'
 
 # CELERY SETTINGS
 CELERY_TIMEZONE = TIME_ZONE
