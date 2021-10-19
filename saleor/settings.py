@@ -216,6 +216,8 @@ if not SECRET_KEY and DEBUG:
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     "saleor.core.middleware.request_time",
     "saleor.core.middleware.discounts",
     "saleor.core.middleware.google_analytics",
@@ -235,6 +237,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.auth",
     "django.contrib.postgres",
+    'django.contrib.sessions',
     # Local apps
     "saleor.plugins",
     "saleor.account",
@@ -359,9 +362,9 @@ AUTH_USER_MODEL = "account.User"
 
 # Auth0 settings
 SOCIAL_AUTH_TRAILING_SLASH = False  # Remove trailing slash from routes
-SOCIAL_AUTH_AUTH0_DOMAIN = 'YOUR-AUTH0-DOMAIN'
-SOCIAL_AUTH_AUTH0_KEY = 'YOUR-AUTH0-CLIENT-ID'
-SOCIAL_AUTH_AUTH0_SECRET = 'YOUR-AUTH0-SECRET'
+SOCIAL_AUTH_AUTH0_DOMAIN = 'dev-zi8s--3b.us.auth0.com'
+SOCIAL_AUTH_AUTH0_KEY = '9a0mMCmEqnj8Zj3GgfSaCSCdeP5sjaJE'
+SOCIAL_AUTH_AUTH0_SECRET = 'Hym6q1xYSje15cMyH1jhudHYlkqTx3FaPo4j-XX2PHAoSkphxOAvdRIcMVhwsm3Z'
 SOCIAL_AUTH_AUTH0_SCOPE = [
     'openid',
     'profile',
