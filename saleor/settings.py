@@ -216,6 +216,8 @@ if not SECRET_KEY and DEBUG:
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     "saleor.core.middleware.request_time",
     "saleor.core.middleware.discounts",
     "saleor.core.middleware.google_analytics",
@@ -235,6 +237,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.auth",
     "django.contrib.postgres",
+    'django.contrib.sessions',
     # Local apps
     "saleor.plugins",
     "saleor.account",
@@ -273,6 +276,7 @@ INSTALLED_APPS = [
     "django_countries",
     "django_filters",
     "phonenumber_field",
+    "social_django",
 ]
 
 
@@ -355,6 +359,17 @@ LOGGING = {
 }
 
 AUTH_USER_MODEL = "account.User"
+
+# Auth0 settings
+SOCIAL_AUTH_TRAILING_SLASH = False  # Remove trailing slash from routes
+SOCIAL_AUTH_AUTH0_DOMAIN = 'dev-zi8s--3b.us.auth0.com'
+SOCIAL_AUTH_AUTH0_KEY = '9a0mMCmEqnj8Zj3GgfSaCSCdeP5sjaJE'
+SOCIAL_AUTH_AUTH0_SECRET = 'Hym6q1xYSje15cMyH1jhudHYlkqTx3FaPo4j-XX2PHAoSkphxOAvdRIcMVhwsm3Z'
+SOCIAL_AUTH_AUTH0_SCOPE = [
+    'openid',
+    'profile',
+    'email'
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -473,7 +488,13 @@ SEARCH_BACKEND = "saleor.search.backends.postgresql"
 
 AUTHENTICATION_BACKENDS = [
     "saleor.core.auth_backend.JSONWebTokenBackend",
+    'social_core.backends.auth0.Auth0OAuth2',
 ]
+
+# webappexample\settings.py
+
+LOGIN_URL = '/login/auth0'
+LOGIN_REDIRECT_URL = '/'
 
 # CELERY SETTINGS
 CELERY_TIMEZONE = TIME_ZONE
