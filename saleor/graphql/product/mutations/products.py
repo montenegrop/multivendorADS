@@ -657,6 +657,7 @@ class ProductCreate(ModelMutation):
 
         # assigning the vendor to product:
         cleaned_input['vendor'] = info.context.user.vendor
+        cleaned_input['base_product'] = models.BaseProduct.objects.all()[:1].get()
 
         clean_seo_fields(cleaned_input)
         return cleaned_input
