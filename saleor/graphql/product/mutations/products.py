@@ -492,7 +492,7 @@ class ProductInput(graphene.InputObjectType):
     weight = WeightScalar(description="Weight of the Product.", required=False)
     rating = graphene.Float(description="Defines the product rating value.")
     base_product = graphene.ID(
-        description="ID of the product's base category.", name="baseProduct")
+        description="ID of the product's base-product.", name="baseProduct")
 
 
 class StockInput(graphene.InputObjectType):

@@ -494,7 +494,7 @@ AUTHENTICATION_BACKENDS = [
 # webappexample\settings.py
 
 LOGIN_URL = '/login/auth0'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/graphql/'
 
 # CELERY SETTINGS
 CELERY_TIMEZONE = TIME_ZONE

@@ -9,6 +9,7 @@ from .graphql.api import schema
 from .graphql.views import GraphQLView
 from .plugins.views import handle_plugin_webhook
 from .product.views import digital_product
+from auth0login import views as auth_views
 
 urlpatterns = [
     url(r"^graphql/", csrf_exempt(GraphQLView.as_view(schema=schema)), name="api"),
@@ -23,6 +24,7 @@ urlpatterns = [
         name="plugins",
     ),
     path('', include('social_django.urls')),
+    path('logout', auth_views.logout),
 ]
 
 if settings.DEBUG:

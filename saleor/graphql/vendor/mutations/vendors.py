@@ -13,6 +13,7 @@ from saleor.graphql.vendor.types.vendors import (
     VendorLocationCreateOrUpdateInput,
     VendorSocialMedia,
     VendorSocialMediaUpdateInput,
+    VendorContact,
 )
 from saleor.graphql.core.utils import validate_image_file
 from saleor.graphql.core.types.common import VendorError

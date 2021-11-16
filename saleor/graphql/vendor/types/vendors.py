@@ -339,6 +339,10 @@ class VendorCreateOrUpdateInput(graphene.InputObjectType):
         description="Vendor description (HTML/text).", required=False)
 
 
+class VendorContactUpdateInput(graphene.InputObjectType):
+    vendor_id = graphene.ID(required=True, description="ID of a vendor.")
+
+
 class VendorImageCreateOrUpdateInput(graphene.InputObjectType):
     vendor_id = graphene.ID(required=True, description="ID of a vendor.")
     image = Upload(required=True, description="Image file.")
