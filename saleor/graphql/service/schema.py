@@ -19,7 +19,7 @@ class ServiceContractCreateOrUpdateInput(graphene.InputObjectType):
 
 
 class ServiceContractCreateOrUpdate(BaseMutation):
-    mensaje = graphene.String()
+    error = graphene.String()
     contract_id = graphene.String()
 
     class Arguments:
@@ -46,7 +46,7 @@ class ServiceContractCreateOrUpdate(BaseMutation):
 
     @classmethod
     def perform_mutation(cls, _root, info, **data):
-        if 'creating' in data.keys():
+        if data['creating']:
             stage = 1
 
             zona = timezone(timedelta(hours=-3), name="argentina-3")
@@ -60,21 +60,17 @@ class ServiceContractCreateOrUpdate(BaseMutation):
             else:
                 vendor = Vendor.objects.get(id=3)
 
-            _type, service_db_id = graphene.relay.Node.from_global_id(
-                data['service_id'])
+            service_db_id = get_database_id(info='info', only_type='BaseProduct',
+                                            node_id=data['service_id'])
             service = BaseProduct.objects.get(id=service_db_id)
             contract = ServiceContract(
                 user=user, vendor=vendor, date=tiempo, service=service)
         else:
             user = User.objects.get(id=3)
 
-        # if not data.id:
-
-        #     contract = ServiceContract()
-
-        x = "hola"
         contract.save()
-        return ServiceContractCreateOrUpdate(mensaje=x, contract_id=contract.id)
+        contract_id = graphene.relay.Node.to_global_id('BaseProduct', int(contract.id))
+        return ServiceContractCreateOrUpdate(error='', contract_id=contract_id)
 
 
 class ServiceMutations(graphene.ObjectType):
