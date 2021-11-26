@@ -885,6 +885,12 @@ class ProductVariantCreate(ModelMutation):
                 cleaned_input["product"]
             )
 
+        # define sku_simple as sku:
+        cleaned_input["sku_simple"] = cleaned_input["sku"]
+        # define sku as sku_simple + 00000 + vendor.id:
+        cleaned_input["sku"] = cleaned_input["sku_simple"] + \
+            '00000' + str(info.context.user.vendor.id)
+
         # Run the validation only if product type is configurable
         if product_type.has_variants:
             # Attributes are provided as list of `AttributeValueInput` objects.

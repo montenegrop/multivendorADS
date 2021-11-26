@@ -29,6 +29,10 @@ def filter_attributes_by_product_types(qs, field, value, requestor, channel_slug
             return qs.none()
 
         tree = category.get_descendants(include_self=True)
+        for product in product_qs:
+            x2 = product_qs.count()
+            if product.category:
+                cate = product.category.name
         product_qs = product_qs.filter(category__in=tree)
 
         if not product_qs.user_has_access_to_all(requestor):
