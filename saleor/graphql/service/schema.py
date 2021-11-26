@@ -7,6 +7,8 @@ from saleor.graphql.core.mutations import BaseMutation
 from saleor.service.models import ServiceContract
 from saleor.account.models import User
 from saleor.vendors.models import Vendor
+from saleor.product.models import BaseProduct
+from saleor.graphql.utils import get_database_id
 
 
 class ServiceContractCreateOrUpdateInput(graphene.InputObjectType):
@@ -25,6 +27,8 @@ class ServiceContractCreateOrUpdate(BaseMutation):
         creating = graphene.Boolean()
         vendor_id = graphene.String(
             description="Vendor id of service provider.", required=False)
+        service_id = graphene.String(
+            description="Service id requested.", required=False)
         accepting = graphene.Boolean()
         concreted = graphene.Boolean()
         service_reviewing = graphene.Boolean()
@@ -55,16 +59,21 @@ class ServiceContractCreateOrUpdate(BaseMutation):
                 vendor = Vendor.objects.get(id=int(data['vendor_id']))
             else:
                 vendor = Vendor.objects.get(id=3)
-            date = datetime.datetime.now()
-            contract = ServiceContract(user=user, vendor=vendor, date=date)
+
+            _type, service_db_id = graphene.relay.Node.from_global_id(
+                data['service_id'])
+            service = BaseProduct.objects.get(id=service_db_id)
+            contract = ServiceContract(
+                user=user, vendor=vendor, date=tiempo, service=service)
         else:
             user = User.objects.get(id=3)
 
-        if not data.id:
+        # if not data.id:
 
-            contract = ServiceContract()
+        #     contract = ServiceContract()
 
         x = "hola"
+        contract.save()
         return ServiceContractCreateOrUpdate(mensaje=x, contract_id=contract.id)
 
 

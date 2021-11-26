@@ -9,13 +9,15 @@ from django_prices.models import MoneyField
 
 from versatileimagefield.fields import PPOIField, VersatileImageField
 # Create your models here.
+from django.utils import timezone
 
 
 class ServiceContract(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     service = models.ForeignKey(BaseProduct, on_delete=models.CASCADE)
-    date = models.DateTimeField
+    created_date = models.DateTimeField(default=timezone.now, editable=False)
+    date = models.DateTimeField()
     # 'YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]
     address = models.CharField(max_length=40, blank=False)
     localidad = models.CharField(max_length=30, blank=False)
