@@ -10,9 +10,16 @@ from saleor.vendors.models import Vendor
 from saleor.product.models import BaseProduct
 from saleor.graphql.utils import get_database_id
 
+# corregir constants:
+# zona = timezone(timedelta(hours=-3), name="argentina-3")
+# tiempo = datetime(year=int(date_array[0]), month=int(date_array[1]), day=int(date_array[2]), hour=int(hour_array[0]),
+#                               minute=int(hour_array[1]), tzinfo=zona)
+
 
 class ServiceContractCreateOrUpdateInput(graphene.InputObjectType):
     date = graphene.String(required=True)
+    hour = graphene.String(required=True)
+    city = graphene.String(required=True)
     address = graphene.String(required=True)
     message = graphene.String(required=True)
     stage = graphene.String(required=True)
@@ -24,7 +31,7 @@ class ServiceContractCreateOrUpdate(BaseMutation):
 
     class Arguments:
         id = graphene.ID(description="ID of the Contract.")
-        creating = graphene.Boolean()
+        creating = graphene.Boolean(required=False)
         vendor_id = graphene.String(
             description="Vendor id of service provider.", required=False)
         service_id = graphene.String(
@@ -49,11 +56,16 @@ class ServiceContractCreateOrUpdate(BaseMutation):
         if data['creating']:
             stage = 1
 
-            zona = timezone(timedelta(hours=-3), name="argentina-3")
-            tiempo = datetime(year=2019, month=6, day=27, hour=3,
-                              minute=0, second=0, tzinfo=zona)
-            tiempo2 = datetime.strptime("March 5, 2014, 20:13:50", "%B %d, %Y, %H:%M:%S").replace(
-                tzinfo=timezone(timedelta(hours=-8), name="menos8"))
+            date_array = data['input']['date'].split("-")
+            hour_array = data['input']['hour'].split(":")
+
+            address = data['input']['address']
+            city = data['input']['city']
+            message = data['input']['message']
+
+            tiempo = datetime(year=int(date_array[0]), month=int(date_array[1]), day=int(date_array[2]), hour=int(hour_array[0]),
+                              minute=int(hour_array[1]))
+
             user = info.context.user
             if 'vendor_if' in data.keys():
                 vendor = Vendor.objects.get(id=int(data['vendor_id']))
@@ -64,7 +76,7 @@ class ServiceContractCreateOrUpdate(BaseMutation):
                                             node_id=data['service_id'])
             service = BaseProduct.objects.get(id=service_db_id)
             contract = ServiceContract(
-                user=user, vendor=vendor, date=tiempo, service=service)
+                user=user, vendor=vendor, date=tiempo, address=address, localidad=city, message=message, service=service)
         else:
             user = User.objects.get(id=3)
 

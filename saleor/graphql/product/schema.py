@@ -120,6 +120,7 @@ from .types import (
     ProductType,
     ProductVariant,
     BaseProduct,
+    PastExperience,
 )
 
 
@@ -255,6 +256,11 @@ class ProductQueries(graphene.ObjectType):
         ),
         description="List of top selling products.",
     )
+    past_experience = graphene.Field(
+        PastExperience,
+        id=graphene.Argument(graphene.ID, description="ID of the past experience."),
+        description="Look up a past experience by ID.",
+    )
 
     def resolve_base_products(self, info, only_services=False, **kwargs):
         return resolve_base_products(info, only_services, **kwargs)
@@ -268,6 +274,11 @@ class ProductQueries(graphene.ObjectType):
             return graphene.Node.get_node_from_global_id(info, id, Category)
         if slug:
             return resolve_category_by_slug(slug=slug)
+
+    def resolve_past_experience(self, info, id=None, slug=None, **kwargs):
+        validate_one_of_args_is_in_query("id", id, "slug", slug)
+        if id:
+            return graphene.Node.get_node_from_global_id(info, id, PastExperience)
 
     def resolve_collection(self, info, id=None, slug=None, channel=None, **_kwargs):
         validate_one_of_args_is_in_query("id", id, "slug", slug)

@@ -1213,6 +1213,7 @@ class PastExperience(CountableDjangoObjectType):
             "past_experience_images",
             "location",
         ]
+        interfaces = [relay.Node, ObjectWithMetadata]
 
     @staticmethod
     def resolve_service(root: models.PastExperience, info):

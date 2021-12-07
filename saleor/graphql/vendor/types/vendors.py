@@ -23,6 +23,7 @@ from saleor.graphql.vendor.dataloaders.vendors import (
 )
 
 from saleor.vendors import models
+from saleor.service.models import ServiceContract as ServiceContractModel
 from saleor.account.models import User
 
 from saleor.product.models import Category as CategoryModel
@@ -167,8 +168,8 @@ class VendorSocialMedia(ObjectType):
 
 
 @key(fields="id")
-class ServiceContact(ObjectType):
-
+class ServiceContract(ObjectType):
+    id = graphene.ID(description="ID del contrato.")
     first_name = graphene.String(description="Name and last name.")
     last_name = graphene.String(description="Name and last name.")
     full_name = graphene.String(description="Full name.")
@@ -180,6 +181,9 @@ class ServiceContact(ObjectType):
         description="City with postal code, ex: Rosario(2000).")
     address = graphene.String(description="Address: Street and postal code.")
     email = graphene.String(description="Email.")
+    datetime = graphene.String(description="date and time of service.")
+    service = graphene.String(description="Nombre del servicio.")
+    message = graphene.String(description="Messaged left by user.")
     # social_media = graphene.List(SocialMedia, description="Social media information.")
 
     # @staticmethod
@@ -193,14 +197,17 @@ class ServiceContact(ObjectType):
 
     @staticmethod
     def resolve_city_with_code(root, info, **_kwargs):
-        return f'{root.city} ({root.postal_code})'
+        if root.city:
+            return f'{root.city} ({root.postal_code})'
+        else:
+            return ""
 
 
 @key(fields="id")
 class Vendor(CountableDjangoObjectType):
 
-    service_contact = graphene.Field(
-        ServiceContact, description="Contact fields for service providers.")
+    service_contracts = graphene.List(
+        ServiceContract, description="Contact fields for service providers.")
 
     past_experiences = FilterInputConnectionField(
         PastExperience, description="Past experiences when vendor gives services.")
@@ -256,26 +263,24 @@ class Vendor(CountableDjangoObjectType):
         return social_media_list
 
     @staticmethod
-    def resolve_service_contact(root: models.Vendor, info, **_kwargs):
+    def resolve_service_contracts(root: models.Vendor, info, **_kwargs):
         # corregir: user with vendor first()
         user_of_vendor = User.objects.filter(vendor=root).first()
-        first_name = user_of_vendor.first_name
-        last_name = user_of_vendor.last_name
-        email = user_of_vendor.email
-        phone = user_of_vendor.phone
-        location = root.location
-        # address = location.full_address
-        city = location.city
-        postal_code = location.postal_code
-
-        return ServiceContact(
-            first_name=first_name,
-            last_name=last_name,
-            phone=phone,
-            email=email,
-            city=city,
-            postal_code=postal_code
-        )
+        contracts = ServiceContractModel.objects.filter(vendor=root)
+        contracts_typed = []
+        for contract in contracts:
+            contracts_typed.append(ServiceContract(id=contract.id,
+                                                   first_name=contract.user.first_name,
+                                                   last_name=contract.user.last_name,
+                                                   email=contract.user.email,
+                                                   phone=contract.user.phone,
+                                                   address=contract.address,
+                                                   city=contract.localidad,
+                                                   datetime=contract.date,
+                                                   service=contract.service.name,
+                                                   message=contract.message,
+                                                   ))
+        return contracts_typed
 
     # corregir: (formato imagen banner, ver get_adjusted)
     @staticmethod

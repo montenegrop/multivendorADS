@@ -538,6 +538,7 @@ class PastExperienceCreate(ModelMutation):
             required=True, description="Fields required to create a past experience")
 
     # corregir: ver permisos
+
     class Meta:
         description = "Creates a new experience for service vendor."
         permissions = ("is_superuser")
@@ -546,7 +547,6 @@ class PastExperienceCreate(ModelMutation):
         error_type_field = "product_errors"
 
     @classmethod
-    @transaction.atomic
     def save(cls, info, instance, cleaned_input):
         if 'service_id' in cleaned_input.keys():
             vendor = info.context.user.vendor
@@ -1724,9 +1724,8 @@ class PastExperienceImageCreate(BaseMutation):
     @classmethod
     def perform_mutation(cls, _root, info, **data):
         data = data.get("input")
-        past_experience = cls.get_node_or_error(
-            info, data["past_experience"], field="past experience", only_type=PastExperience
-        )
+        past_experience = cls.get_node_by_pk(
+            info, PastExperience, data["past_experience"])
 
         image_data = info.context.FILES.get(data["image"])
         # validate_image_file(image_data, "image")
