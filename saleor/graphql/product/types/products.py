@@ -1217,5 +1217,4 @@ class PastExperience(CountableDjangoObjectType):
 
     @staticmethod
     def resolve_service(root: models.PastExperience, info):
-        print(info, 1218)
         return root.product.base_product
