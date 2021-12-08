@@ -2629,6 +2629,7 @@ input MoveProductInput {
 
 type Mutation {
   serviceContractCreateOrUpdate(accepting: Boolean, concreted: Boolean, creating: Boolean, id: ID, input: ServiceContractCreateOrUpdateInput!, serviceId: String, serviceReviewing: Boolean, userReviewing: Boolean, vendorId: String): ServiceContractCreateOrUpdate
+  serviceContractImageCreate(input: ServiceContractCreateInput!): ServiceContractImageCreate
   vendorCreateOrUpdate(id: ID, input: VendorCreateOrUpdateInput!): VendorCreateOrUpdate
   vendorLocationCreateOrUpdate(id: ID, input: VendorLocationCreateOrUpdateInput!): VendorLocationCreateOrUpdate
   vendorImageCreateOrUpdate(input: VendorImageCreateOrUpdateInput, isAvatar: Boolean): VendorImageCreateOrUpdate
@@ -3571,13 +3572,15 @@ type PasswordChange {
   accountErrors: [AccountError!]!
 }
 
-type PastExperience {
+type PastExperience implements Node & ObjectWithMetadata {
   id: ID!
   location: ExperienceLocation
   descriptionShort: String!
   descriptionLong: String!
   yearPerformed: Int
   pastExperienceImages(before: String, after: String, first: Int, last: Int): PastExperienceImageCountableConnection!
+  privateMetadata: [MetadataItem]!
+  metadata: [MetadataItem]!
   service: BaseProduct
 }
 
@@ -4559,6 +4562,7 @@ type Query {
   productVariant(id: ID, sku: String, channel: String): ProductVariant
   productVariants(ids: [ID], channel: String, filter: ProductVariantFilterInput, before: String, after: String, first: Int, last: Int): ProductVariantCountableConnection
   reportProductSales(period: ReportingPeriod!, channel: String!, before: String, after: String, first: Int, last: Int): ProductVariantCountableConnection
+  pastExperience(id: ID): PastExperience
   payment(id: ID!): Payment
   payments(before: String, after: String, first: Int, last: Int): PaymentCountableConnection
   page(id: ID, slug: String): Page
@@ -4793,8 +4797,10 @@ input SeoInput {
   description: String
 }
 
-type ServiceContract {
-  id: ID
+type ServiceContract implements Node & ObjectWithMetadata {
+  id: ID!
+  privateMetadata: [MetadataItem]!
+  metadata: [MetadataItem]!
   firstName: String
   lastName: String
   fullName: String
@@ -4810,6 +4816,13 @@ type ServiceContract {
   message: String
 }
 
+input ServiceContractCreateInput {
+  alt: String
+  position: String!
+  image: Upload!
+  serviceContract: ID!
+}
+
 type ServiceContractCreateOrUpdate {
   errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
   error: String
@@ -4818,9 +4831,28 @@ type ServiceContractCreateOrUpdate {
 
 input ServiceContractCreateOrUpdateInput {
   date: String!
+  hour: String!
+  city: String!
   address: String!
   message: String!
   stage: String!
+}
+
+type ServiceContractImage implements Node {
+  id: ID!
+  image: String!
+  ppoi: String!
+  alt: String!
+  position: Int!
+  url(size: Int): String!
+}
+
+type ServiceContractImageCreate {
+  errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
+  serviceContract: ServiceContract
+  image: ServiceContractImage
+  position: String
+  productErrors: [ProductError!]!
 }
 
 type SetPassword {
@@ -6202,7 +6234,7 @@ enum WeightUnitsEnum {
 
 scalar _Any
 
-union _Entity = ProductVariant | BaseProduct | Product | ProductType | Collection | Category | ProductImage | PastExperienceImage | ExperienceLocation | PastExperience | VendorLocation | VendorContact | VendorServiceImage | VendorAvatarImage | VendorMainImage | VendorSocialMedia | ServiceContract | Vendor | Address | User | Group | App | PageType
+union _Entity = ProductVariant | BaseProduct | Product | ProductType | Collection | Category | ProductImage | PastExperienceImage | ExperienceLocation | PastExperience | VendorLocation | VendorContact | VendorServiceImage | VendorAvatarImage | VendorMainImage | VendorSocialMedia | ServiceContract | Vendor | Address | User | Group | App | PageType | ServiceContractImage
 
 type _Service {
   sdl: String

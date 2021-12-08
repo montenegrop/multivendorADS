@@ -2,6 +2,7 @@
 import graphene
 from graphene_federation import key
 from graphene import relay
+from graphene.relay import is_node
 from graphene_django.types import DjangoObjectType, ObjectType
 
 from saleor.graphql.core.fields import (
@@ -168,8 +169,7 @@ class VendorSocialMedia(ObjectType):
 
 
 @key(fields="id")
-class ServiceContract(ObjectType):
-    id = graphene.ID(description="ID del contrato.")
+class ServiceContract(CountableDjangoObjectType):
     first_name = graphene.String(description="Name and last name.")
     last_name = graphene.String(description="Name and last name.")
     full_name = graphene.String(description="Full name.")
@@ -183,8 +183,16 @@ class ServiceContract(ObjectType):
     email = graphene.String(description="Email.")
     datetime = graphene.String(description="date and time of service.")
     service = graphene.String(description="Nombre del servicio.")
-    message = graphene.String(description="Messaged left by user.")
     # social_media = graphene.List(SocialMedia, description="Social media information.")
+
+    class Meta:
+        model = ServiceContractModel
+        # interfaces = [relay.Node]
+        only_fields = [
+            "id",
+            "message"
+        ]
+        interfaces = [relay.Node, ObjectWithMetadata]
 
     # @staticmethod
     # def resolve_social_media(root, info, **_kwargs):
@@ -206,7 +214,7 @@ class ServiceContract(ObjectType):
 @key(fields="id")
 class Vendor(CountableDjangoObjectType):
 
-    service_contracts = graphene.List(
+    service_contracts = FilterInputConnectionField(
         ServiceContract, description="Contact fields for service providers.")
 
     past_experiences = FilterInputConnectionField(
@@ -269,18 +277,18 @@ class Vendor(CountableDjangoObjectType):
         contracts = ServiceContractModel.objects.filter(vendor=root)
         contracts_typed = []
         for contract in contracts:
-            contracts_typed.append(ServiceContract(id=contract.id,
-                                                   first_name=contract.user.first_name,
-                                                   last_name=contract.user.last_name,
-                                                   email=contract.user.email,
-                                                   phone=contract.user.phone,
-                                                   address=contract.address,
-                                                   city=contract.localidad,
-                                                   datetime=contract.date,
-                                                   service=contract.service.name,
-                                                   message=contract.message,
-                                                   ))
-        return contracts_typed
+            contracts_typed.append(ServiceContract(
+                first_name=contract.user.first_name,
+                last_name=contract.user.last_name,
+                email=contract.user.email,
+                phone=contract.user.phone,
+                address=contract.address,
+                city=contract.localidad,
+                datetime=contract.date,
+                service=contract.service.name,
+                message=contract.message,
+            ))
+        return contracts
 
     # corregir: (formato imagen banner, ver get_adjusted)
     @staticmethod
