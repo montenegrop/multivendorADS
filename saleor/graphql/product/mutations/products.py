@@ -1734,7 +1734,11 @@ class PastExperienceImageCreate(BaseMutation):
         image_data = info.context.FILES.get(data["image"])
         # validate_image_file(image_data, "image")
 
-        image = past_experience.past_experience_images.update_or_create(
+        image, created = past_experience.past_experience_images.update_or_create(
             image=image_data, alt=data.get("alt", ""), position=int(data["position"]))
         # past_experience = ChannelContext(node=product, channel_slug=None)
-        return PastExperienceImageCreate(past_experience=past_experience, image=image, position=data["image"])
+        return PastExperienceImageCreate(
+            past_experience=past_experience,
+            image=image,
+            position=image.position
+        )
