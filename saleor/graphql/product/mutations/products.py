@@ -550,8 +550,12 @@ class PastExperienceCreate(ModelMutation):
     def save(cls, info, instance, cleaned_input):
         if 'service_id' in cleaned_input.keys():
             vendor = info.context.user.vendor
-            product, created = models.Product.objects.get_or_create(
-                vendor=vendor, base_product_id=cleaned_input['service_id'])
+            # corregir:
+            product = models.Product.objects.filter(
+                vendor=vendor, base_product_id=cleaned_input['service_id']).last()
+            if not product:
+                prduct = models.objects.create(
+                    vendor=vendor, base_product_id=cleaned_input['service_id'])
             instance.product = product
         super().save(info, instance, cleaned_input)
 
@@ -1724,13 +1728,13 @@ class PastExperienceImageCreate(BaseMutation):
     @classmethod
     def perform_mutation(cls, _root, info, **data):
         data = data.get("input")
-        past_experience = cls.get_node_by_pk(
-            info, PastExperience, data["past_experience"])
+        past_experience = cls.get_node_or_error(
+            info=info, node_id=data["past_experience"], only_type=PastExperience)
 
         image_data = info.context.FILES.get(data["image"])
         # validate_image_file(image_data, "image")
 
-        image = past_experience.past_experience_images.create(
+        image = past_experience.past_experience_images.update_or_create(
             image=image_data, alt=data.get("alt", ""), position=int(data["position"]))
         # past_experience = ChannelContext(node=product, channel_slug=None)
         return PastExperienceImageCreate(past_experience=past_experience, image=image, position=data["image"])
