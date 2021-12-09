@@ -170,11 +170,11 @@ class VendorSocialMedia(ObjectType):
 
 @key(fields="id")
 class ServiceContract(CountableDjangoObjectType):
-    first_name = graphene.String(description="Name and last name.")
-    last_name = graphene.String(description="Name and last name.")
+    first_name = graphene.String(description="Name.")
+    last_name = graphene.String(description="Last name.")
     full_name = graphene.String(description="Full name.")
     phone = graphene.String(description="Phone: might not be cellphone.")
-    celphone = graphene.String(description="Cellphone.")
+    cellphone = graphene.String(description="Cellphone.")
     city = graphene.String(description="City.")
     postal_code = graphene.String(description="Postal code.")
     city_with_code = graphene.String(
@@ -190,7 +190,8 @@ class ServiceContract(CountableDjangoObjectType):
         # interfaces = [relay.Node]
         only_fields = [
             "id",
-            "message"
+            "address",
+            "message",
         ]
         interfaces = [relay.Node, ObjectWithMetadata]
 
@@ -200,8 +201,40 @@ class ServiceContract(CountableDjangoObjectType):
     #     return root.full_name
 
     @staticmethod
+    def resolve_datetime(root, info, **_kwargs):
+        return root.datetime
+
+    @staticmethod
+    def resolve_city(root, info, **_kwargs):
+        return root.localidad
+
+    @staticmethod
+    def resolve_service(root, info, **_kwargs):
+        return root.service.name
+
+    @staticmethod
+    def resolve_email(root, info, **_kwargs):
+        return root.user.email
+
+    @staticmethod
+    def resolve_phone(root, info, **_kwargs):
+        return root.user.phone
+
+    @staticmethod
+    def resolve_cellphone(root, info, **_kwargs):
+        return root.user.cellphone
+
+    @staticmethod
+    def resolve_first_name(root, info, **_kwargs):
+        return root.user.first_name
+
+    @staticmethod
+    def resolve_last_name(root, info, **_kwargs):
+        return root.user.last_name
+
+    @staticmethod
     def resolve_full_name(root, info, **_kwargs):
-        return root.first_name + root.last_name
+        return root.user.first_name + root.user.last_name
 
     @staticmethod
     def resolve_city_with_code(root, info, **_kwargs):
@@ -275,19 +308,6 @@ class Vendor(CountableDjangoObjectType):
         # corregir: user with vendor first()
         user_of_vendor = User.objects.filter(vendor=root).first()
         contracts = ServiceContractModel.objects.filter(vendor=root)
-        contracts_typed = []
-        for contract in contracts:
-            contracts_typed.append(ServiceContract(
-                first_name=contract.user.first_name,
-                last_name=contract.user.last_name,
-                email=contract.user.email,
-                phone=contract.user.phone,
-                address=contract.address,
-                city=contract.localidad,
-                datetime=contract.date,
-                service=contract.service.name,
-                message=contract.message,
-            ))
         return contracts
 
     # corregir: (formato imagen banner, ver get_adjusted)
