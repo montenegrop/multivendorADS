@@ -4799,21 +4799,32 @@ input SeoInput {
 
 type ServiceContract implements Node & ObjectWithMetadata {
   id: ID!
+  address: String
+  message: String!
   privateMetadata: [MetadataItem]!
   metadata: [MetadataItem]!
   firstName: String
   lastName: String
   fullName: String
   phone: String
-  celphone: String
+  cellphone: String
   city: String
   postalCode: String
   cityWithCode: String
-  address: String
   email: String
   datetime: String
   service: String
-  message: String
+}
+
+type ServiceContractCountableConnection {
+  pageInfo: PageInfo!
+  edges: [ServiceContractCountableEdge!]!
+  totalCount: Int
+}
+
+type ServiceContractCountableEdge {
+  node: ServiceContract!
+  cursor: String!
 }
 
 input ServiceContractCreateInput {
@@ -5663,7 +5674,7 @@ type Vendor implements Node & ObjectWithMetadata {
   contacts: [VendorContact!]!
   privateMetadata: [MetadataItem]!
   metadata: [MetadataItem]!
-  serviceContracts: [ServiceContract]
+  serviceContracts(before: String, after: String, first: Int, last: Int): ServiceContractCountableConnection
   pastExperiences(before: String, after: String, first: Int, last: Int): PastExperienceCountableConnection
   mainImage: VendorMainImage
   avatarImage: VendorAvatarImage

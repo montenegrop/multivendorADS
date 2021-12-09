@@ -81,11 +81,21 @@ class ServiceContractCreateOrUpdate(BaseMutation):
             else:
                 vendor = Vendor.objects.get(id=3)
 
-            service_db_id = get_database_id(info='info', only_type='BaseProduct',
-                                            node_id=data['service_id'])
+            service_db_id = get_database_id(
+                info='info',
+                only_type='BaseProduct',
+                node_id=data['service_id']
+            )
             service = BaseProduct.objects.get(id=service_db_id)
-            contract = ServiceContract(
-                user=user, vendor=vendor, date=tiempo, address=address, localidad=city, message=message, service=service)
+            contract = ServiceContractModel(
+                user=user,
+                vendor=vendor,
+                date=tiempo,
+                address=address,
+                localidad=city,
+                message=message,
+                service=service
+            )
         else:
             user = User.objects.get(id=3)
 
