@@ -105,14 +105,14 @@ class ServiceContractCreateOrUpdate(BaseMutation):
         return ServiceContractCreateOrUpdate(error='', contract_id=contract_id)
 
 
-class ServiceContractCreateInput(graphene.InputObjectType):
+class ServiceContractImageCreateInput(graphene.InputObjectType):
     alt = graphene.String(description="Alt text for an image.")
     position = graphene.String(
         required=True, description="Values from 0 to 4. 0 is main service contract image.")
     image = Upload(
         required=True, description="Represents an image file in a multipart request."
     )
-    service_contract = graphene.ID(
+    contract_id = graphene.ID(
         required=True, description="ID of a service contract."
     )
 
@@ -123,7 +123,7 @@ class ServiceContractImageCreate(BaseMutation):
     position = graphene.String(description="Position of image.")
 
     class Arguments:
-        input = ServiceContractCreateInput(
+        input = ServiceContractImageCreateInput(
             required=True, description="Fields required to create a service contract image."
         )
 
@@ -141,14 +141,14 @@ class ServiceContractImageCreate(BaseMutation):
     def perform_mutation(cls, _root, info, **data):
         data = data.get("input")
         service_contract = cls.get_node_or_error(
-            info=info, node_id=data["service_contract"], only_type=ServiceContract)
+            info=info, node_id=data["contract_id"], only_type=ServiceContract)
 
         image_data = info.context.FILES.get(data["image"])
         # validate_image_file(image_data, "image")
 
         image, created = service_contract.vendor_contract_review_images.update_or_create(
             image=image_data, alt=data.get("alt", ""), position=int(data["position"]))
-        return PastExperienceImageCreate(
+        return ServiceContractImageCreate(
             service_contract=service_contract,
             image=image,
             position=image.position

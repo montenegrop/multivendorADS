@@ -2629,7 +2629,7 @@ input MoveProductInput {
 
 type Mutation {
   serviceContractCreateOrUpdate(accepting: Boolean, concreted: Boolean, creating: Boolean, id: ID, input: ServiceContractCreateOrUpdateInput!, serviceId: String, serviceReviewing: Boolean, userReviewing: Boolean, vendorId: String): ServiceContractCreateOrUpdate
-  serviceContractImageCreate(input: ServiceContractCreateInput!): ServiceContractImageCreate
+  serviceContractImageCreate(input: ServiceContractImageCreateInput!): ServiceContractImageCreate
   vendorCreateOrUpdate(id: ID, input: VendorCreateOrUpdateInput!): VendorCreateOrUpdate
   vendorLocationCreateOrUpdate(id: ID, input: VendorLocationCreateOrUpdateInput!): VendorLocationCreateOrUpdate
   vendorImageCreateOrUpdate(input: VendorImageCreateOrUpdateInput, isAvatar: Boolean): VendorImageCreateOrUpdate
@@ -4827,13 +4827,6 @@ type ServiceContractCountableEdge {
   cursor: String!
 }
 
-input ServiceContractCreateInput {
-  alt: String
-  position: String!
-  image: Upload!
-  serviceContract: ID!
-}
-
 type ServiceContractCreateOrUpdate {
   errors: [Error!]! @deprecated(reason: "Use typed errors with error codes. This field will be removed after 2020-07-31.")
   error: String
@@ -4864,6 +4857,13 @@ type ServiceContractImageCreate {
   image: ServiceContractImage
   position: String
   productErrors: [ProductError!]!
+}
+
+input ServiceContractImageCreateInput {
+  alt: String
+  position: String!
+  image: Upload!
+  contractId: ID!
 }
 
 type SetPassword {
