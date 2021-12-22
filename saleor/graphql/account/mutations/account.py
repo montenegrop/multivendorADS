@@ -25,7 +25,25 @@ from .base import (
 
 from saleor.vendors.models import Vendor, VendorLocation
 
-from saleor.account.models import TYPES_OF_IDENTIFICATION, TYPES_OF_IDENTIFICATION_OPTIONS
+from saleor.account.models import TYPES_OF_IDENTIFICATION, TYPES_OF_IDENTIFICATION_OPTIONS, U1, U2, U3, U4, U5
+
+
+def determine_user_type(
+    provides_services=False,
+    register_store=False,
+    a_consumidor_final=False,
+    mayorista_no_corporativo=False
+):
+    if not (provides_services or register_store):
+        return U1
+    elif provides_services:
+        return U5
+    elif register_store and a_consumidor_final:
+        return U2
+    elif register_store and not a_consumidor_final and mayorista_no_corporativo:
+        return U3
+    else:
+        return U4
 
 
 class AccountRegisterInput(graphene.InputObjectType):
@@ -40,13 +58,24 @@ class AccountRegisterInput(graphene.InputObjectType):
     type_of_identification = graphene.Enum(
         'type_of_identification', TYPES_OF_IDENTIFICATION_OPTIONS)(required=False)
     # graphene.String(description="Type of ID.", required=False)
-    identification = graphene.String(description="Id", required=False)
+    identification = graphene.String(
+        description="Identification string.", required=False)
     phone = graphene.String(description="Phone.", required=False)
     first_name = graphene.String(description="First name.", required=False)
     last_name = graphene.String(description="Lasrt name.", required=False)
     provides_services = graphene.Boolean(
         description="User is service-provides.", required=False)
     cellphone = graphene.String(description="Phone.", required=False)
+
+    # store (vendor props):
+    isRegisteringStore = distribuidor_no_corporativo = graphene.Boolean(
+        description="Registrando tienda no usuario/proveedor .", required=False)
+    cuit = graphene.String(description="Store cuit", required=False)
+    razon_social = graphene.String(description="Store razon social", required=False)
+    a_consumidores_finales = graphene.Boolean(
+        description="Sells to final consumers.", required=False)
+    distribuidor_no_corporativo = graphene.Boolean(
+        description="Distribuidor no corporativo.", required=False)
 
 
 class AccountRegister(ModelMutation):
@@ -111,7 +140,31 @@ class AccountRegister(ModelMutation):
     @classmethod
     def save(cls, info, user, cleaned_input):
         password = cleaned_input["password"]
-        if cleaned_input["provides_services"]:
+        isRegisteringStore = cleaned_input["isRegisteringStore"] if "isRegisteringStore" in cleaned_input else False
+
+        if isRegisteringStore:
+
+            cuit = cleaned_input["cuit"]
+            razon_social = cleaned_input["razon_social"]
+            user_type = determine_user_type(
+                register_store=True,
+                a_consumidor_final=cleaned_input["a_consumidores_finales"],
+                mayorista_no_corporativo=["distribuidor_no_corporativo"]
+            )
+
+            vendor = Vendor.objects.create(
+                name=user.email,
+                slug=user.email + '_slug',
+                cuit=cuit,
+                razon_social=razon_social,
+            )
+
+            user.vendor = vendor
+            user.user_type = user_type
+            user.is_superuser = True
+            user.is_staff = True
+
+        elif cleaned_input["provides_services"]:
             # vendor:
             vendor = Vendor.objects.create(
                 name=user.email, slug=user.email + '_slug')
