@@ -373,7 +373,9 @@ class User(CountableDjangoObjectType):
 
     @staticmethod
     def resolve_vendor_id(root: models.User, _info, **_kwargs):
-        return graphene.Node.to_global_id(Vendor._meta.name, root.vendor.id)
+        if root.vendor:
+            return graphene.Node.to_global_id(Vendor._meta.name, root.vendor.id)
+        return None
 
     @staticmethod
     def resolve_vendor_location_id(root: models.User, _info, **_kwargs):

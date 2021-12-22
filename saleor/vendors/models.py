@@ -21,6 +21,10 @@ class Vendor(ModelWithMetadata):
     slug = models.SlugField(max_length=55, unique=True, allow_unicode=True)
     relevance = models.IntegerField(default=0)
 
+    # fields for "store register":
+    cuit = models.CharField(max_length=50, blank=True)
+    razon_social = models.CharField(max_length=150, blank=True)
+
     # fields for "empresa":
     description = models.TextField(blank=True)
     bussiness = models.TextField(blank=True)

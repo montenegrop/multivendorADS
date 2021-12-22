@@ -38,7 +38,8 @@ NO_COMPLETED = "No completa"
 
 
 class VendorContractReview(models.Model):
-    contract = models.ForeignKey(ServiceContract, on_delete=models.CASCADE)
+    contract = models.ForeignKey(
+        ServiceContract, on_delete=models.CASCADE, related_name="vendor_contract_reviews")
     concreted = models.BooleanField(default=False)
 
     MOTIVES_CHOICES = [

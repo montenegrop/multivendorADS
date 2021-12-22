@@ -151,6 +151,20 @@ TYPES_OF_IDENTIFICATION_OPTIONS = [
     ("PASSPORT", PASSPORT),
 ]
 
+U1 = "CONSUMIDOR_FINAL"
+U2 = "TIENDAS_MINORISTAS"
+U3 = "MAYORISTAS/DISTRIBUIDOR"
+U4 = "CORPORATIVOS"
+U5 = "PRESTADOR_DE_SERVICIOS"
+
+USER_TYPES_CHOICES = (
+    (U1, "Consumidor_final"),
+    (U2, "Tiendas_minoristas"),
+    (U3, "Mayoristas/Distribuidor"),
+    (U4, "Corporativos"),
+    (U5, "Prestador_de_servicios")
+)
+
 
 class User(PermissionsMixin, ModelWithMetadata, AbstractBaseUser):
     email = models.EmailField(unique=True)
@@ -179,6 +193,12 @@ class User(PermissionsMixin, ModelWithMetadata, AbstractBaseUser):
     vendor = models.ForeignKey(
         Vendor, related_name="users", null=True, on_delete=models.CASCADE, blank=True
     )
+
+    types_of_users = models.CharField(max_length=40,
+                                      choices=USER_TYPES_CHOICES,
+                                      default="CONSUMIDOR_FINAL")
+
+    # user_type = models.
 
     type_of_identification = models.CharField(
         max_length=30,
