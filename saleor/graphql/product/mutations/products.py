@@ -1670,12 +1670,12 @@ class BaseProductCreateInput(graphene.InputObjectType):
     product_type = graphene.ID(
         description="ID of the type the base product belongs to.",
         name="productType",
-        required=True,
+        required=False,
     )
     category = graphene.ID(
-        description="ID of the base product's category.", name="category")
+        description="ID of the base product's category.", name="category", required=False)
     name = graphene.String(description="Base product name.")
-    slug = graphene.String(description="Base product slug.")
+    slug = graphene.String(description="Base product slug.", required=False)
 
 
 class BaseProductCreate(ModelMutation):
