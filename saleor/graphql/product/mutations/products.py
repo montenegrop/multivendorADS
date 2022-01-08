@@ -1680,6 +1680,10 @@ class BaseProductCreateInput(graphene.InputObjectType):
 
 class BaseProductCreate(ModelMutation):
     class Arguments:
+        id = graphene.ID(
+            required=False,
+            description="ID the base product to modify.",
+        )
         input = BaseProductCreateInput(
             required=True,
             description="Fields required to create a base product."
