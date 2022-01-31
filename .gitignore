@@ -32,7 +32,12 @@ dist/
 /media/
 /node_modules/
 /static/
-
+# venv
+/lib/
+/lib64/
+/bin/
+lib64
+pyvenv.cfg
 # Exported results file
 django-queries-results.html
 
