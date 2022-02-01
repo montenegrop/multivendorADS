@@ -29,10 +29,10 @@ def flatten_metadata(metadata):
     return flattened_metadata
 
 
-def flatten_attributes_metadata(apps, _schema_editor):
-    Attribute = apps.get_model("product", "Attribute")
-    for attribute in Attribute.objects.iterator():
-        flatten_model_metadata(attribute)
+# def flatten_attributes_metadata(apps, _schema_editor):
+#     Attribute = apps.get_model("product", "Attribute")
+#     for attribute in Attribute.objects.iterator():
+#         flatten_model_metadata(attribute)
 
 
 def flatten_categories_metadata(apps, _schema_editor):
@@ -111,7 +111,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(flatten_attributes_metadata),
+        # migrations.RunPython(flatten_attributes_metadata),
         migrations.RunPython(flatten_categories_metadata),
         migrations.RunPython(flatten_checkouts_metadata),
         migrations.RunPython(flatten_collections_metadata),
